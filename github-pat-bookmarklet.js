@@ -121,6 +121,84 @@ function getCurrentPermissions() {
   return current;
 }
 
+// Set repository access type
+function setRepositoryAccess(accessType) {
+  // accessType can be: 'none' (public only), 'all', or 'selected'
+  const radioButtons = {
+    'none': document.getElementById('install_target_none'),
+    'all': document.getElementById('install_target_all'),
+    'selected': document.getElementById('install_target_selected')
+  };
+  
+  const targetRadio = radioButtons[accessType];
+  if (!targetRadio) {
+    console.error(`Invalid repository access type: ${accessType}. Use 'none', 'all', or 'selected'`);
+    return false;
+  }
+  
+  targetRadio.click();
+  console.log(`Set repository access to: ${accessType}`);
+  
+  // If 'selected' is chosen, we'll need to handle repository selection separately
+  if (accessType === 'selected') {
+    console.log('Note: You will need to select specific repositories manually or use selectRepositories() function');
+  }
+  
+  return true;
+}
+
+// Get current repository access setting
+function getRepositoryAccess() {
+  const radioButtons = document.querySelectorAll('input[name="install_target"]');
+  
+  for (const radio of radioButtons) {
+    if (radio.checked) {
+      const value = radio.value;
+      let description = '';
+      
+      switch(value) {
+        case 'none':
+          description = 'Public repositories only (read-only)';
+          break;
+        case 'all':
+          description = 'All repositories (current and future)';
+          break;
+        case 'selected':
+          description = 'Selected repositories only';
+          break;
+      }
+      
+      console.log(`Current repository access: ${value} - ${description}`);
+      return value;
+    }
+  }
+  
+  console.log('No repository access type selected');
+  return null;
+}
+
+// Helper function to wait for repository picker to load
+function waitForRepositoryPicker(callback, maxAttempts = 20) {
+  let attempts = 0;
+  const checkInterval = setInterval(() => {
+    attempts++;
+    
+    // Look for the repository search input or list
+    const repoSearchInput = document.querySelector('.js-integrations-install-repo-selection input[type="text"]');
+    const repoList = document.querySelector('.js-integrations-install-repo-selection .js-repository-picker-results');
+    
+    if (repoSearchInput || repoList || attempts >= maxAttempts) {
+      clearInterval(checkInterval);
+      if (attempts >= maxAttempts) {
+        console.error('Repository picker did not load in time');
+      } else {
+        console.log('Repository picker loaded');
+        if (callback) callback();
+      }
+    }
+  }, 500);
+}
+
 // Test: Set blocking permission to read-write
 // setPermission('blocking', 'write');
 
@@ -131,3 +209,8 @@ function getCurrentPermissions() {
 //   'issues': 'write',
 //   'pull_requests': 'write'
 // });
+
+// Example: Set repository access
+// setRepositoryAccess('all'); // All repos
+// setRepositoryAccess('selected'); // Selected repos only
+// setRepositoryAccess('none'); // Public repos only

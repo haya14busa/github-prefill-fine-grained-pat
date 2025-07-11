@@ -32,6 +32,18 @@ setMultiplePermissions({
 });
 ```
 
+### Repository Access
+
+```javascript
+// Set repository access type
+setRepositoryAccess('all');      // All repositories
+setRepositoryAccess('selected'); // Selected repositories only
+setRepositoryAccess('none');     // Public repositories only
+
+// Get current repository access setting
+getRepositoryAccess();
+```
+
 ### Permission Values
 
 - `'none'` - No access
