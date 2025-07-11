@@ -779,36 +779,21 @@ window.ghPat.applyFromUrlParams = async function() {
       // No need for additional wait - setResourceOwner now waits for confirmation
     }
     
-    // Repository access and permissions depend on resource owner being set
-    const ownerDependentPromises = [];
-    
     // Repository access must be set before selecting repositories
     if (config.repoAccess) {
-      ownerDependentPromises.push(new Promise(async resolve => {
-        window.ghPat.setRepositoryAccess(config.repoAccess);
-        await new Promise(r => setTimeout(r, 500));
-        
-        // Select repositories only after repo access is set
-        if (config.repos && config.repos.length > 0 && config.repoAccess === 'selected') {
-          await window.ghPat.selectRepositories(config.repos);
-        }
-        resolve();
-      }));
+      window.ghPat.setRepositoryAccess(config.repoAccess);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Select repositories only after repo access is set
+      if (config.repos && config.repos.length > 0 && config.repoAccess === 'selected') {
+        await window.ghPat.selectRepositories(config.repos);
+      }
     }
     
-    // Permissions also depend on resource owner
+    // Set permissions
     if (config.permissions && Object.keys(config.permissions).length > 0) {
-      ownerDependentPromises.push(new Promise(resolve => {
-        // Add a small delay to ensure UI is ready
-        setTimeout(() => {
-          window.ghPat.setMultiplePermissions(config.permissions);
-          resolve();
-        }, 500);
-      }));
+      window.ghPat.setMultiplePermissions(config.permissions);
     }
-    
-    // Wait for all owner-dependent operations
-    await Promise.all(ownerDependentPromises);
     
     console.log('Configuration applied successfully!');
     return true;
