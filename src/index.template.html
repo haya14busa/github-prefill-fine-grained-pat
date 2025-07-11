@@ -40,7 +40,7 @@
             margin-top: 0;
             color: #0969da;
         }
-        .preset button {
+        .preset button, .preset a.button {
             background: #2ea44f;
             color: white;
             border: none;
@@ -49,9 +49,15 @@
             cursor: pointer;
             font-size: 14px;
             margin-right: 10px;
+            text-decoration: none;
+            display: inline-block;
         }
-        .preset button:hover {
+        .preset button:hover, .preset a.button:hover {
             background: #2c974b;
+        }
+        .preset pre {
+            margin: 10px 0;
+            font-size: 12px;
         }
         code {
             background: #f6f8fa;
@@ -125,206 +131,51 @@
     <div class="preset">
         <h3>CI/CD Token (Read-only)</h3>
         <p>Suitable for continuous integration workflows that need to read code and download packages.</p>
-        <pre><code>ghPat.setTokenName('CI/CD Read-only Token');
-ghPat.setTokenDescription('Automated CI/CD workflow - read access only');
-ghPat.setExpiration(30); // 30 days expiration
-ghPat.setRepositoryAccess('all');
-ghPat.setMultiplePermissions({
-  'contents': 'read',
-  'metadata': 'read',
-  'packages': 'read'
-});</code></pre>
-        <button onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy Code</button>
+        <pre><code>https://github.com/settings/personal-access-tokens/new?name=CI%2FCD+Read-only+Token&description=Automated+CI%2FCD+workflow+-+read+access+only&expiration=30&repo_access=all&permissions=contents:read,metadata:read,packages:read</code></pre>
+        <a href="https://github.com/settings/personal-access-tokens/new?name=CI%2FCD+Read-only+Token&description=Automated+CI%2FCD+workflow+-+read+access+only&expiration=30&repo_access=all&permissions=contents:read,metadata:read,packages:read" target="_blank" class="preset button">Open Configuration</a>
+        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
     </div>
 
     <div class="preset">
-        <h3>Organization Token</h3>
-        <p>Token for organization repositories with specific permissions.</p>
-        <pre><code>ghPat.setResourceOwner('my-org'); // Set organization
-ghPat.setExpiration(30);
-ghPat.setRepositoryAccess('selected');
-ghPat.setMultiplePermissions({
-  'contents': 'write',
-  'pull_requests': 'write',
-  'issues': 'read',
-  'metadata': 'read'
-});</code></pre>
-        <button onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy Code</button>
+        <h3>Read All Permissions</h3>
+        <p>Read access to all available permissions for comprehensive monitoring or backup.</p>
+        <pre><code>https://github.com/settings/personal-access-tokens/new?name=Read+All+Token&description=Read+access+to+all+permissions&expiration=30&repo_access=all&permissions=actions:read,administration:read,checks:read,contents:read,deployments:read,environments:read,issues:read,metadata:read,packages:read,pages:read,pull_requests:read,repository_hooks:read,repository_projects:read,security_events:read,statuses:read,vulnerability_alerts:read</code></pre>
+        <a href="https://github.com/settings/personal-access-tokens/new?name=Read+All+Token&description=Read+access+to+all+permissions&expiration=30&repo_access=all&permissions=actions:read,administration:read,checks:read,contents:read,deployments:read,environments:read,issues:read,metadata:read,packages:read,pages:read,pull_requests:read,repository_hooks:read,repository_projects:read,security_events:read,statuses:read,vulnerability_alerts:read" target="_blank" class="preset button">Open Configuration</a>
+        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
+    </div>
+
+    <div class="preset">
+        <h3>Write All Permissions</h3>
+        <p>Full write access to all permissions (use with extreme caution!).</p>
+        <pre><code>https://github.com/settings/personal-access-tokens/new?name=Write+All+Token&description=Full+write+access+-+use+with+caution&expiration=7&repo_access=selected&permissions=actions:write,administration:write,checks:write,contents:write,deployments:write,environments:write,issues:write,metadata:read,packages:write,pages:write,pull_requests:write,repository_hooks:write,repository_projects:write,security_events:write,statuses:write,vulnerability_alerts:write</code></pre>
+        <a href="https://github.com/settings/personal-access-tokens/new?name=Write+All+Token&description=Full+write+access+-+use+with+caution&expiration=7&repo_access=selected&permissions=actions:write,administration:write,checks:write,contents:write,deployments:write,environments:write,issues:write,metadata:read,packages:write,pages:write,pull_requests:write,repository_hooks:write,repository_projects:write,security_events:write,statuses:write,vulnerability_alerts:write" target="_blank" class="preset button">Open Configuration</a>
+        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
     </div>
 
     <div class="preset">
         <h3>Development Token</h3>
         <p>For local development with ability to push code and manage issues/PRs.</p>
-        <pre><code>ghPat.setExpiration(7); // 7 days for security
-ghPat.setRepositoryAccess('selected');
-ghPat.setMultiplePermissions({
-  'contents': 'write',
-  'issues': 'write',
-  'pull_requests': 'write',
-  'metadata': 'read'
-});</code></pre>
-        <button onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy Code</button>
+        <pre><code>https://github.com/settings/personal-access-tokens/new?name=Development+Token&description=Local+development+access&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read</code></pre>
+        <a href="https://github.com/settings/personal-access-tokens/new?name=Development+Token&description=Local+development+access&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read" target="_blank" class="preset button">Open Configuration</a>
+        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
     </div>
 
     <div class="preset">
         <h3>Release Automation</h3>
         <p>For automated release workflows that need to create releases and upload packages.</p>
-        <pre><code>ghPat.setExpiration(90); // 90 days for automation
-ghPat.setRepositoryAccess('selected');
-ghPat.setMultiplePermissions({
-  'contents': 'write',
-  'packages': 'write',
-  'metadata': 'read',
-  'actions': 'read'
-});</code></pre>
-        <button onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy Code</button>
+        <pre><code>https://github.com/settings/personal-access-tokens/new?name=Release+Automation&description=Automated+release+workflow&expiration=90&repo_access=selected&permissions=contents:write,packages:write,metadata:read,actions:read</code></pre>
+        <a href="https://github.com/settings/personal-access-tokens/new?name=Release+Automation&description=Automated+release+workflow&expiration=90&repo_access=selected&permissions=contents:write,packages:write,metadata:read,actions:read" target="_blank" class="preset button">Open Configuration</a>
+        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
     </div>
 
     <div class="preset">
-        <h3>Long-term Service Token</h3>
-        <p>For services that need extended access (use with caution).</p>
-        <pre><code>// Set custom expiration 6 months from now
-const sixMonths = new Date();
-sixMonths.setMonth(sixMonths.getMonth() + 6);
-const dateStr = sixMonths.toISOString().split('T')[0];
-
-ghPat.setExpiration('custom', dateStr);
-ghPat.setRepositoryAccess('selected');
-ghPat.setMultiplePermissions({
-  'contents': 'read',
-  'metadata': 'read'
-});</code></pre>
-        <button onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy Code</button>
+        <h3>Minimal Token</h3>
+        <p>Minimal access for testing or verification purposes.</p>
+        <pre><code>https://github.com/settings/personal-access-tokens/new?name=Minimal+Token&description=Minimal+access+for+testing&expiration=1&repo_access=none&permissions=metadata:read</code></pre>
+        <a href="https://github.com/settings/personal-access-tokens/new?name=Minimal+Token&description=Minimal+access+for+testing&expiration=1&repo_access=none&permissions=metadata:read" target="_blank" class="preset button">Open Configuration</a>
+        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
     </div>
 
-    <div class="preset">
-        <h3>Admin Token</h3>
-        <p>Full access for repository administration (use sparingly and rotate frequently).</p>
-        <pre><code>ghPat.setExpiration(7); // Short expiration for admin tokens!
-ghPat.setRepositoryAccess('selected');
-ghPat.setMultiplePermissions({
-  'administration': 'write',
-  'contents': 'write',
-  'issues': 'write',
-  'pull_requests': 'write',
-  'packages': 'write',
-  'metadata': 'read'
-});</code></pre>
-        <button onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy Code</button>
-    </div>
-
-    <h2>🛠️ Custom Configuration Builder</h2>
-    <div class="config-builder">
-        <h3>Build Your Own Configuration</h3>
-        
-        <div class="permission-group">
-            <label>Resource Owner:
-                <input type="text" id="resource-owner" value="" placeholder="e.g., haya14busa or my-org" onchange="updateGeneratedCode()" style="padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 4px; margin-left: 10px; width: 200px;">
-            </label>
-            <small style="display: block; margin-left: 110px; color: #666;">Leave empty to use current user</small>
-        </div>
-        
-        <div class="permission-group">
-            <label>Repository Access:
-                <select id="repo-access" onchange="updateGeneratedCode()">
-                    <option value="none">Public repositories only</option>
-                    <option value="all">All repositories</option>
-                    <option value="selected">Selected repositories</option>
-                </select>
-            </label>
-        </div>
-
-        <div class="permission-group">
-            <label>Token Expiration:
-                <select id="token-expiration" onchange="updateGeneratedCode(); toggleCustomDate()">
-                    <option value="7">7 days</option>
-                    <option value="30" selected>30 days</option>
-                    <option value="60">60 days</option>
-                    <option value="90">90 days</option>
-                    <option value="custom">Custom</option>
-                    <option value="none">No expiration</option>
-                </select>
-            </label>
-            <label id="custom-date-group" style="display: none; margin-left: 10px;">
-                Custom Date:
-                <input type="date" id="custom-date" onchange="updateGeneratedCode()" style="padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 4px;">
-            </label>
-        </div>
-
-        <h4>Permissions:</h4>
-        <div id="permissions-list">
-            <div class="permission-group">
-                <label>Contents:
-                    <select data-permission="contents" onchange="updateGeneratedCode()">
-                        <option value="none">No access</option>
-                        <option value="read">Read</option>
-                        <option value="write">Write</option>
-                    </select>
-                </label>
-            </div>
-            <div class="permission-group">
-                <label>Issues:
-                    <select data-permission="issues" onchange="updateGeneratedCode()">
-                        <option value="none">No access</option>
-                        <option value="read">Read</option>
-                        <option value="write">Write</option>
-                    </select>
-                </label>
-            </div>
-            <div class="permission-group">
-                <label>Pull requests:
-                    <select data-permission="pull_requests" onchange="updateGeneratedCode()">
-                        <option value="none">No access</option>
-                        <option value="read">Read</option>
-                        <option value="write">Write</option>
-                    </select>
-                </label>
-            </div>
-            <div class="permission-group">
-                <label>Packages:
-                    <select data-permission="packages" onchange="updateGeneratedCode()">
-                        <option value="none">No access</option>
-                        <option value="read">Read</option>
-                        <option value="write">Write</option>
-                    </select>
-                </label>
-            </div>
-            <div class="permission-group">
-                <label>Actions:
-                    <select data-permission="actions" onchange="updateGeneratedCode()">
-                        <option value="none">No access</option>
-                        <option value="read">Read</option>
-                        <option value="write">Write</option>
-                    </select>
-                </label>
-            </div>
-            <div class="permission-group">
-                <label>Administration:
-                    <select data-permission="administration" onchange="updateGeneratedCode()">
-                        <option value="none">No access</option>
-                        <option value="read">Read</option>
-                        <option value="write">Write</option>
-                    </select>
-                </label>
-            </div>
-            <div class="permission-group">
-                <label>Metadata:
-                    <select data-permission="metadata" onchange="updateGeneratedCode()">
-                        <option value="none">No access</option>
-                        <option value="read" selected>Read</option>
-                    </select>
-                </label>
-            </div>
-        </div>
-
-        <h4>Generated Code:</h4>
-        <pre id="generated-code"></pre>
-        <button onclick="copyToClipboard(document.getElementById('generated-code').textContent)">Copy Code</button>
-        
-        <h4 style="margin-top: 20px;">Shareable URL:</h4>
-        <pre id="generated-url" style="word-wrap: break-word; white-space: pre-wrap;"></pre>
-        <button onclick="copyToClipboard(document.getElementById('generated-url').textContent)">Copy URL</button>
-    </div>
 
     <h2>📚 Usage Guide</h2>
     <h3>Available Functions</h3>
@@ -383,101 +234,6 @@ ghPat.setMultiplePermissions({
             });
         }
 
-        function updateGeneratedCode() {
-            const resourceOwner = document.getElementById('resource-owner').value.trim();
-            const expiration = document.getElementById('token-expiration').value;
-            const repoAccess = document.getElementById('repo-access').value;
-            const permissions = {};
-            
-            document.querySelectorAll('[data-permission]').forEach(select => {
-                const permission = select.getAttribute('data-permission');
-                const value = select.value;
-                if (value !== 'none') {
-                    permissions[permission] = value;
-                }
-            });
-
-            // Generate code
-            let code = '';
-            
-            // Add resource owner if specified
-            if (resourceOwner) {
-                code += `ghPat.setResourceOwner('${resourceOwner}');\n`;
-            }
-            
-            // Add expiration setting
-            if (expiration === 'none') {
-                code += `ghPat.setExpiration('${expiration}');\n`;
-            } else if (expiration === 'custom') {
-                const customDate = document.getElementById('custom-date').value;
-                if (customDate) {
-                    code += `ghPat.setExpiration('custom', '${customDate}');\n`;
-                } else {
-                    code += `ghPat.setExpiration('custom'); // Set date manually\n`;
-                }
-            } else {
-                code += `ghPat.setExpiration(${expiration});\n`;
-            }
-            
-            code += `ghPat.setRepositoryAccess('${repoAccess}');\n`;
-            
-            if (Object.keys(permissions).length > 0) {
-                code += 'ghPat.setMultiplePermissions({\n';
-                const permEntries = Object.entries(permissions).map(([key, value]) => 
-                    `  '${key}': '${value}'`
-                );
-                code += permEntries.join(',\n');
-                code += '\n});';
-            }
-
-            document.getElementById('generated-code').textContent = code;
-            
-            // Generate shareable URL
-            const params = new URLSearchParams();
-            const baseUrl = 'https://github.com/settings/personal-access-tokens/new';
-            
-            if (resourceOwner) {
-                params.set('owner', resourceOwner);
-            }
-            
-            if (expiration === 'none') {
-                params.set('expiration', 'none');
-            } else if (expiration === 'custom') {
-                const customDate = document.getElementById('custom-date').value;
-                if (customDate) {
-                    params.set('expiration', 'custom');
-                    params.set('expiration_date', customDate);
-                }
-            } else {
-                params.set('expiration', expiration);
-            }
-            
-            params.set('repo_access', repoAccess);
-            
-            if (Object.keys(permissions).length > 0) {
-                const permsArray = Object.entries(permissions).map(([resource, level]) => `${resource}:${level}`);
-                params.set('permissions', permsArray.join(','));
-            }
-            
-            const shareableUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
-            document.getElementById('generated-url').textContent = shareableUrl;
-        }
-
-        function toggleCustomDate() {
-            const expiration = document.getElementById('token-expiration').value;
-            const customDateGroup = document.getElementById('custom-date-group');
-            customDateGroup.style.display = expiration === 'custom' ? 'inline' : 'none';
-            
-            // Set default custom date to 30 days from now
-            if (expiration === 'custom' && !document.getElementById('custom-date').value) {
-                const futureDate = new Date();
-                futureDate.setDate(futureDate.getDate() + 30);
-                document.getElementById('custom-date').value = futureDate.toISOString().split('T')[0];
-            }
-        }
-
-        // Initialize the code on page load
-        updateGeneratedCode();
     </script>
 </body>
 </html>
