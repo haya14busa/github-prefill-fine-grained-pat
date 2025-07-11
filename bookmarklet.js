@@ -171,7 +171,7 @@ javascript:(function(){
     },
     
     addRepository: function(repoName) {
-      const selectButton = document.querySelector('#repository-menu-list-button');
+      const selectButton = document.querySelector('#repository-menu-list');
       if (!selectButton) {
         console.error('Repository select button not found');
         return;

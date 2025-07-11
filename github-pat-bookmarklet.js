@@ -236,7 +236,7 @@ function selectRepositories(repoNames) {
 // Add a single repository to the selection
 function addRepository(repoName) {
   // Click the "Select repositories" button to open the dropdown
-  const selectButton = document.querySelector('#repository-menu-list-button');
+  const selectButton = document.querySelector('#repository-menu-list');
   if (!selectButton) {
     console.error('Repository select button not found');
     return;
