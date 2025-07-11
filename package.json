@@ -1,0 +1,27 @@
+{
+  "name": "github-pat-helper",
+  "version": "1.0.0",
+  "description": "A bookmarklet tool to automate GitHub fine-grained personal access token creation",
+  "main": "src/github-pat-bookmarklet.js",
+  "scripts": {
+    "build": "npm run build:bookmarklet && npm run build:html",
+    "build:bookmarklet": "terser src/github-pat-bookmarklet.js -c -m --toplevel -o dist/bookmarklet.min.js && node scripts/create-bookmarklet.js",
+    "build:html": "node scripts/build-html.js",
+    "dev": "npm run build && npm run serve",
+    "serve": "npx http-server dist -p 8080",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean && mkdir -p dist"
+  },
+  "keywords": [
+    "github",
+    "personal-access-token",
+    "bookmarklet",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "terser": "^5.24.0",
+    "http-server": "^14.1.1"
+  }
+}

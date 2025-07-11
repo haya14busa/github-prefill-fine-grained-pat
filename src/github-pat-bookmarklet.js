@@ -1,7 +1,10 @@
 // GitHub Fine-grained PAT auto-configuration script
-// Usage: setPermission('blocking', 'write')
+// Usage: ghPat.setPermission('blocking', 'write')
 
-function setPermission(resourceName, accessLevel) {
+// Create global object for bookmarklet
+window.ghPat = window.ghPat || {};
+
+window.ghPat.setPermission = function(resourceName, accessLevel) {
   // Find permission rows by resource name
   const permissionRows = document.querySelectorAll('li.js-list-group-item');
   
@@ -44,18 +47,18 @@ function setPermission(resourceName, accessLevel) {
 }
 
 // Set multiple permissions at once
-function setMultiplePermissions(permissions) {
+window.ghPat.setMultiplePermissions = function(permissions) {
   let delay = 0;
   for (const [resource, access] of Object.entries(permissions)) {
     setTimeout(() => {
-      setPermission(resource, access);
+      window.ghPat.setPermission(resource, access);
     }, delay);
     delay += 200; // Add delay between operations
   }
 }
 
 // List all available permissions on the current page
-function listAvailablePermissions() {
+window.ghPat.listAvailablePermissions = function() {
   const permissions = {};
   const permissionRows = document.querySelectorAll('li.js-list-group-item');
   
@@ -105,8 +108,8 @@ function listAvailablePermissions() {
 }
 
 // Get current permission settings
-function getCurrentPermissions() {
-  const permissions = listAvailablePermissions();
+window.ghPat.getCurrentPermissions = function() {
+  const permissions = window.ghPat.listAvailablePermissions();
   const current = {};
   
   for (const [resource, info] of Object.entries(permissions)) {
@@ -122,7 +125,7 @@ function getCurrentPermissions() {
 }
 
 // Set repository access type
-function setRepositoryAccess(accessType) {
+window.ghPat.setRepositoryAccess = function(accessType) {
   // accessType can be: 'none' (public only), 'all', or 'selected'
   const radioButtons = {
     'none': document.getElementById('install_target_none'),
@@ -148,7 +151,7 @@ function setRepositoryAccess(accessType) {
 }
 
 // Get current repository access setting
-function getRepositoryAccess() {
+window.ghPat.getRepositoryAccess = function() {
   const radioButtons = document.querySelectorAll('input[name="install_target"]');
   
   for (const radio of radioButtons) {
@@ -178,7 +181,7 @@ function getRepositoryAccess() {
 }
 
 // Helper function to wait for repository picker to load
-function waitForRepositoryPicker(maxAttempts = 20) {
+window.ghPat.waitForRepositoryPicker = function(maxAttempts = 20) {
   return new Promise((resolve, reject) => {
     let attempts = 0;
     const checkInterval = setInterval(() => {
@@ -213,12 +216,12 @@ function waitForRepositoryPicker(maxAttempts = 20) {
 // });
 
 // Select specific repositories (when repository access is set to 'selected')
-async function selectRepositories(repoNames) {
+window.ghPat.selectRepositories = async function(repoNames) {
   try {
     // First ensure 'selected' mode is active
-    if (getRepositoryAccess() !== 'selected') {
+    if (window.ghPat.getRepositoryAccess() !== 'selected') {
       console.log('Setting repository access to "selected" first...');
-      setRepositoryAccess('selected');
+      window.ghPat.setRepositoryAccess('selected');
       // Wait for UI to update
       await new Promise(resolve => setTimeout(resolve, 500));
     }
@@ -233,10 +236,10 @@ async function selectRepositories(repoNames) {
     console.log('Opening repository picker...');
     
     // Wait for repository picker to load
-    await waitForRepositoryPicker();
+    await window.ghPat.waitForRepositoryPicker();
     
     // Clear any existing selections first
-    clearAllRepositories();
+    window.ghPat.clearAllRepositories();
     
     // Wait a bit for UI to update
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -244,7 +247,7 @@ async function selectRepositories(repoNames) {
     // Add each repository sequentially
     for (const repoName of repoNames) {
       try {
-        await addRepository(repoName);
+        await window.ghPat.addRepository(repoName);
         // Small delay between selections
         await new Promise(resolve => setTimeout(resolve, 300));
       } catch (error) {
@@ -270,7 +273,7 @@ async function selectRepositories(repoNames) {
 }
 
 // Add a single repository to the selection
-async function addRepository(repoName, maxRetries = 5) {
+window.ghPat.addRepository = async function(repoName, maxRetries = 5) {
   // Find the search input (assumes picker is already open)
   const searchInput = document.querySelector('#repository-menu-list-filter');
   if (!searchInput) {
@@ -318,7 +321,7 @@ async function addRepository(repoName, maxRetries = 5) {
 }
 
 // Clear all selected repositories
-function clearAllRepositories() {
+window.ghPat.clearAllRepositories = function() {
   const removeButtons = document.querySelectorAll('.js-repository-picker-remove');
   removeButtons.forEach(button => {
     button.click();
@@ -327,7 +330,7 @@ function clearAllRepositories() {
 }
 
 // Get currently selected repositories
-function getSelectedRepositories() {
+window.ghPat.getSelectedRepositories = function() {
   const selectedRepos = [];
   const repoElements = document.querySelectorAll('.js-repository-picker-result .repo-and-owner');
   
@@ -343,9 +346,21 @@ function getSelectedRepositories() {
 }
 
 // Example: Set repository access
-// setRepositoryAccess('all'); // All repos
-// setRepositoryAccess('selected'); // Selected repos only
-// setRepositoryAccess('none'); // Public repos only
+// ghPat.setRepositoryAccess('all'); // All repos
+// ghPat.setRepositoryAccess('selected'); // Selected repos only
+// ghPat.setRepositoryAccess('none'); // Public repos only
 
 // Example: Select specific repositories
-// selectRepositories(['myrepo', 'another-repo', 'third-repo']);
+// ghPat.selectRepositories(['myrepo', 'another-repo', 'third-repo']);
+
+// Log initialization message
+console.log('GitHub PAT Helper loaded! Available functions:');
+console.log('- ghPat.setPermission(resource, level)');
+console.log('- ghPat.setMultiplePermissions({resource: level, ...})');
+console.log('- ghPat.listAvailablePermissions()');
+console.log('- ghPat.getCurrentPermissions()');
+console.log('- ghPat.setRepositoryAccess(type)');
+console.log('- ghPat.getRepositoryAccess()');
+console.log('- ghPat.selectRepositories([repo1, repo2, ...])');
+console.log('- ghPat.clearAllRepositories()');
+console.log('- ghPat.getSelectedRepositories()');
