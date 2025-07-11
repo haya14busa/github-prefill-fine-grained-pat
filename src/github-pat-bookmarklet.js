@@ -697,56 +697,60 @@ window.ghPat.applyFromUrlParams = async function() {
 
   console.log('Applying configuration from URL parameters:', config);
 
-  // Apply configuration in order
+  // Apply configuration
   try {
-    // Set token name
+    const promises = [];
+    
+    // These can run in parallel (no dependencies)
     if (config.name) {
-      window.ghPat.setTokenName(config.name);
-      await new Promise(resolve => setTimeout(resolve, 200));
+      promises.push(Promise.resolve(window.ghPat.setTokenName(config.name)));
     }
     
-    // Set description
     if (config.description) {
-      window.ghPat.setTokenDescription(config.description);
-      await new Promise(resolve => setTimeout(resolve, 200));
+      promises.push(Promise.resolve(window.ghPat.setTokenDescription(config.description)));
     }
     
-    // Set resource owner
     if (config.owner) {
-      window.ghPat.setResourceOwner(config.owner);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      promises.push(new Promise(resolve => {
+        window.ghPat.setResourceOwner(config.owner);
+        setTimeout(resolve, 500);
+      }));
     }
     
-    // Set expiration
     if (config.expiration) {
-      if (config.expiration === 'custom' && config.expirationDate) {
-        window.ghPat.setExpiration('custom', config.expirationDate);
-      } else if (config.expiration === 'none') {
-        window.ghPat.setExpiration('none');
-      } else {
-        // Convert string to number for numeric expiration days
-        const expirationDays = parseInt(config.expiration, 10);
-        if (!isNaN(expirationDays)) {
-          window.ghPat.setExpiration(expirationDays);
+      promises.push(new Promise(resolve => {
+        if (config.expiration === 'custom' && config.expirationDate) {
+          window.ghPat.setExpiration('custom', config.expirationDate);
+        } else if (config.expiration === 'none') {
+          window.ghPat.setExpiration('none');
         } else {
-          console.error(`Invalid expiration value: ${config.expiration}`);
+          // Convert string to number for numeric expiration days
+          const expirationDays = parseInt(config.expiration, 10);
+          if (!isNaN(expirationDays)) {
+            window.ghPat.setExpiration(expirationDays);
+          } else {
+            console.error(`Invalid expiration value: ${config.expiration}`);
+          }
         }
-      }
-      await new Promise(resolve => setTimeout(resolve, 500));
+        setTimeout(resolve, 500);
+      }));
     }
     
-    // Set repository access
+    // Wait for independent operations to complete
+    await Promise.all(promises);
+    
+    // Repository access must be set before selecting repositories
     if (config.repoAccess) {
       window.ghPat.setRepositoryAccess(config.repoAccess);
       await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Select repositories only after repo access is set
+      if (config.repos && config.repos.length > 0 && config.repoAccess === 'selected') {
+        await window.ghPat.selectRepositories(config.repos);
+      }
     }
     
-    // Select repositories if specified
-    if (config.repos && config.repos.length > 0) {
-      await window.ghPat.selectRepositories(config.repos);
-    }
-    
-    // Set permissions
+    // Permissions can be set independently
     if (config.permissions && Object.keys(config.permissions).length > 0) {
       window.ghPat.setMultiplePermissions(config.permissions);
     }
