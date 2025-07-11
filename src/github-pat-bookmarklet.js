@@ -60,6 +60,35 @@ window.ghPat.getTokenDescription = function() {
   return description;
 }
 
+// Wait for permission elements to be available
+window.ghPat.waitForPermissionElements = function(maxRetries = 30) {
+  return new Promise((resolve, reject) => {
+    let retries = 0;
+    
+    const checkElements = () => {
+      const permissionRows = document.querySelectorAll('li.js-list-group-item');
+      const hasPermissions = permissionRows.length > 0 && 
+        Array.from(permissionRows).some(row => 
+          row.querySelector('button[data-resource]') && 
+          row.querySelector('.js-action-selection-list-menu-button')
+        );
+      
+      if (hasPermissions) {
+        resolve();
+      } else {
+        retries++;
+        if (retries >= maxRetries) {
+          reject(new Error(`Permission elements not found after ${maxRetries} attempts`));
+        } else {
+          setTimeout(checkElements, 200);
+        }
+      }
+    };
+    
+    checkElements();
+  });
+}
+
 window.ghPat.setPermission = function(resourceName, accessLevel) {
   // Find permission rows by resource name
   const permissionRows = document.querySelectorAll('li.js-list-group-item');
@@ -178,6 +207,35 @@ window.ghPat.getCurrentPermissions = function() {
   console.log(current);
   
   return current;
+}
+
+// Wait for repository access radio buttons to be available
+window.ghPat.waitForRepositoryAccessElements = function(maxRetries = 30) {
+  return new Promise((resolve, reject) => {
+    let retries = 0;
+    
+    const checkElements = () => {
+      const radioButtons = {
+        'none': document.getElementById('install_target_none'),
+        'all': document.getElementById('install_target_all'),
+        'selected': document.getElementById('install_target_selected')
+      };
+      
+      // Check if all radio buttons are available
+      if (radioButtons.none && radioButtons.all && radioButtons.selected) {
+        resolve(radioButtons);
+      } else {
+        retries++;
+        if (retries >= maxRetries) {
+          reject(new Error(`Repository access elements not found after ${maxRetries} attempts`));
+        } else {
+          setTimeout(checkElements, 200);
+        }
+      }
+    };
+    
+    checkElements();
+  });
 }
 
 // Set repository access type
@@ -776,11 +834,40 @@ window.ghPat.applyFromUrlParams = async function() {
     // Set resource owner first (repository access and permissions depend on this)
     if (config.owner) {
       await window.ghPat.setResourceOwner(config.owner);
-      // No need for additional wait - setResourceOwner now waits for confirmation
+      
+      // Wait for page to reload and elements to be available
+      const waitPromises = [];
+      
+      if (config.repoAccess || (config.repos && config.repos.length > 0)) {
+        waitPromises.push(window.ghPat.waitForRepositoryAccessElements());
+      }
+      
+      if (config.permissions && Object.keys(config.permissions).length > 0) {
+        waitPromises.push(window.ghPat.waitForPermissionElements());
+      }
+      
+      if (waitPromises.length > 0) {
+        try {
+          await Promise.all(waitPromises);
+          console.log('Page elements loaded after owner change');
+        } catch (error) {
+          console.error('Failed to load page elements after owner change:', error);
+          // Continue anyway - elements might still be accessible
+        }
+      }
     }
     
     // Repository access must be set before selecting repositories
     if (config.repoAccess) {
+      // If owner wasn't set, still need to wait for elements
+      if (!config.owner) {
+        try {
+          await window.ghPat.waitForRepositoryAccessElements();
+        } catch (error) {
+          console.error('Repository access elements not available:', error);
+        }
+      }
+      
       window.ghPat.setRepositoryAccess(config.repoAccess);
       await new Promise(resolve => setTimeout(resolve, 500));
       
@@ -792,6 +879,15 @@ window.ghPat.applyFromUrlParams = async function() {
     
     // Set permissions
     if (config.permissions && Object.keys(config.permissions).length > 0) {
+      // If owner wasn't set, still need to wait for elements
+      if (!config.owner) {
+        try {
+          await window.ghPat.waitForPermissionElements();
+        } catch (error) {
+          console.error('Permission elements not available:', error);
+        }
+      }
+      
       window.ghPat.setMultiplePermissions(config.permissions);
     }
     
