@@ -1119,8 +1119,28 @@ console.log('- ghPat.copyConfigUrl() // Copy configuration URL to clipboard');
 console.log('- ghPat.openConfigUrl() // Open configuration URL in new tab');
 console.log('- ghPat.updateUrlParams() // Update current URL with configuration');
 
-// Auto-apply URL parameters if present
-if (window.location.search) {
-  console.log('URL parameters detected. Applying configuration...');
-  window.ghPat.applyFromUrlParams();
-}
+// Auto-detect whether to apply URL params or save current config
+(async function() {
+  const hasUrlParams = window.location.search;
+  
+  // Check if form has any values
+  const hasFormValues = Boolean(
+    window.ghPat.getTokenName() ||
+    window.ghPat.getTokenDescription() ||
+    window.ghPat.getCurrentPermissions() && Object.keys(window.ghPat.getCurrentPermissions()).length > 0
+  );
+  
+  if (hasUrlParams && !hasFormValues) {
+    // URL params exist and form is empty - apply params
+    console.log('URL parameters detected and form is empty. Applying configuration...');
+    await window.ghPat.applyFromUrlParams();
+  } else if (hasFormValues) {
+    // Form has values - save current configuration
+    console.log('Form has values. Updating URL and copying configuration...');
+    window.ghPat.updateUrlParams();
+    window.ghPat.copyConfigUrl();
+  } else {
+    // No URL params and no form values
+    console.log('Ready to use. Fill the form or visit a URL with parameters.');
+  }
+})();

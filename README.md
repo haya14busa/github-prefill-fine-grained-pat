@@ -155,7 +155,10 @@ ghPat.openConfigUrl();
 ghPat.updateUrlParams();
 ```
 
-When you visit a GitHub PAT creation page with URL parameters and run the bookmarklet, it will automatically apply the configuration.
+When you run the bookmarklet, it automatically decides what to do:
+- **If URL has parameters and form is empty**: Applies the configuration from URL
+- **If form has values**: Updates the URL and copies the configuration link to clipboard
+- **If both are empty**: Does nothing, ready for manual use
 
 #### Supported URL Parameters
 
