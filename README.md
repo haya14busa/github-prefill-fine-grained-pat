@@ -33,6 +33,22 @@ Then visit http://localhost:8080
 
 ## Usage
 
+### Resource Owner
+
+```javascript
+// Set resource owner (personal account or organization)
+ghPat.setResourceOwner('haya14busa');     // Personal account
+ghPat.setResourceOwner('my-org');         // Organization
+
+// Get current resource owner
+ghPat.getResourceOwner(); // Returns: 'haya14busa'
+
+// List available resource owners
+ghPat.getAvailableResourceOwners();
+// Returns array with details about each owner:
+// [{name: 'haya14busa', isOrganization: false, limit: null, limitLabel: null}, ...]
+```
+
 ### Basic Functions
 
 ```javascript

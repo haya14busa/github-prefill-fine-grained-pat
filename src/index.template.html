@@ -136,6 +136,21 @@ ghPat.setMultiplePermissions({
     </div>
 
     <div class="preset">
+        <h3>Organization Token</h3>
+        <p>Token for organization repositories with specific permissions.</p>
+        <pre><code>ghPat.setResourceOwner('my-org'); // Set organization
+ghPat.setExpiration(30);
+ghPat.setRepositoryAccess('selected');
+ghPat.setMultiplePermissions({
+  'contents': 'write',
+  'pull_requests': 'write',
+  'issues': 'read',
+  'metadata': 'read'
+});</code></pre>
+        <button onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy Code</button>
+    </div>
+
+    <div class="preset">
         <h3>Development Token</h3>
         <p>For local development with ability to push code and manage issues/PRs.</p>
         <pre><code>ghPat.setExpiration(7); // 7 days for security
@@ -199,6 +214,13 @@ ghPat.setMultiplePermissions({
     <h2>🛠️ Custom Configuration Builder</h2>
     <div class="config-builder">
         <h3>Build Your Own Configuration</h3>
+        
+        <div class="permission-group">
+            <label>Resource Owner:
+                <input type="text" id="resource-owner" value="" placeholder="e.g., haya14busa or my-org" onchange="updateGeneratedCode()" style="padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 4px; margin-left: 10px; width: 200px;">
+            </label>
+            <small style="display: block; margin-left: 110px; color: #666;">Leave empty to use current user</small>
+        </div>
         
         <div class="permission-group">
             <label>Repository Access:
@@ -314,6 +336,9 @@ ghPat.setMultiplePermissions({
         <li><code>ghPat.setExpiration('custom', 'YYYY-MM-DD')</code> - Set custom expiration date</li>
         <li><code>ghPat.setCustomExpirationDate('YYYY-MM-DD')</code> - Set date after selecting custom</li>
         <li><code>ghPat.getExpiration()</code> - Get current expiration setting</li>
+        <li><code>ghPat.setResourceOwner('owner-name')</code> - Set resource owner (user or organization)</li>
+        <li><code>ghPat.getResourceOwner()</code> - Get current resource owner</li>
+        <li><code>ghPat.getAvailableResourceOwners()</code> - List available resource owners</li>
     </ul>
 
     <script>
@@ -326,6 +351,7 @@ ghPat.setMultiplePermissions({
         }
 
         function updateGeneratedCode() {
+            const resourceOwner = document.getElementById('resource-owner').value.trim();
             const expiration = document.getElementById('token-expiration').value;
             const repoAccess = document.getElementById('repo-access').value;
             const permissions = {};
@@ -339,6 +365,11 @@ ghPat.setMultiplePermissions({
             });
 
             let code = '';
+            
+            // Add resource owner if specified
+            if (resourceOwner) {
+                code += `ghPat.setResourceOwner('${resourceOwner}');\n`;
+            }
             
             // Add expiration setting
             if (expiration === 'none') {

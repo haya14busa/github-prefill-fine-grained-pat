@@ -455,6 +455,114 @@ window.ghPat.setCustomExpirationDate = function(date) {
   return true;
 }
 
+// Set resource owner (user or organization)
+window.ghPat.setResourceOwner = function(ownerName) {
+  // Click the resource owner dropdown button
+  const dropdownButton = document.getElementById('resource-owner-select-panel-button');
+  if (!dropdownButton) {
+    console.error('Resource owner dropdown button not found');
+    return false;
+  }
+  
+  dropdownButton.click();
+  
+  // Wait for dropdown to open
+  setTimeout(() => {
+    // Find the owner in the list
+    const ownerButtons = document.querySelectorAll('.ActionListItem button[data-value]');
+    let found = false;
+    
+    for (const button of ownerButtons) {
+      if (button.getAttribute('data-value') === ownerName) {
+        button.click();
+        console.log(`Set resource owner to: ${ownerName}`);
+        found = true;
+        break;
+      }
+    }
+    
+    if (!found) {
+      console.error(`Resource owner not found: ${ownerName}`);
+      console.log('Hint: Available owners can be listed with getAvailableResourceOwners()');
+    }
+  }, 300);
+  
+  return true;
+}
+
+// Get current resource owner
+window.ghPat.getResourceOwner = function() {
+  const dropdownButton = document.getElementById('resource-owner-select-panel-button');
+  if (!dropdownButton) {
+    console.error('Resource owner dropdown button not found');
+    return null;
+  }
+  
+  // Get the current value from the hidden input
+  const hiddenInput = document.querySelector('input[name="target_name"]');
+  if (hiddenInput) {
+    const owner = hiddenInput.value;
+    console.log(`Current resource owner: ${owner}`);
+    return owner;
+  }
+  
+  // Fallback: try to get from button text
+  const buttonText = dropdownButton.textContent.trim();
+  // Remove extra whitespace and extract the owner name
+  const match = buttonText.match(/\s+([\w-]+)\s*$/);
+  if (match) {
+    const owner = match[1];
+    console.log(`Current resource owner: ${owner}`);
+    return owner;
+  }
+  
+  console.log('Could not determine current resource owner');
+  return null;
+}
+
+// Get list of available resource owners
+window.ghPat.getAvailableResourceOwners = function() {
+  // Click the dropdown to load the list
+  const dropdownButton = document.getElementById('resource-owner-select-panel-button');
+  if (!dropdownButton) {
+    console.error('Resource owner dropdown button not found');
+    return [];
+  }
+  
+  dropdownButton.click();
+  
+  // Wait for dropdown to load and collect owners
+  setTimeout(() => {
+    const owners = [];
+    const ownerButtons = document.querySelectorAll('.ActionListItem button[data-value]');
+    
+    ownerButtons.forEach(button => {
+      const value = button.getAttribute('data-value');
+      const isOrg = button.closest('li').getAttribute('data-actor-is-organization') === 'true';
+      const fgLimit = button.closest('li').getAttribute('data-fg-limit');
+      const fgLimitLabel = button.closest('li').getAttribute('data-fg-limit-label');
+      
+      owners.push({
+        name: value,
+        isOrganization: isOrg,
+        limit: fgLimit ? parseInt(fgLimit) : null,
+        limitLabel: fgLimitLabel || null
+      });
+    });
+    
+    console.log('Available resource owners:');
+    console.table(owners);
+    
+    // Close the dropdown
+    const closeButton = document.querySelector('[data-close-dialog-id="resource-owner-select-panel-dialog"]');
+    if (closeButton) {
+      closeButton.click();
+    }
+    
+    return owners;
+  }, 500);
+}
+
 // Example: Set repository access
 // ghPat.setRepositoryAccess('all'); // All repos
 // ghPat.setRepositoryAccess('selected'); // Selected repos only
@@ -478,3 +586,6 @@ console.log('- ghPat.setExpiration(days) // 7, 30, 60, 90, "custom", or "none"')
 console.log('- ghPat.setExpiration("custom", "2025-12-31") // Set custom date');
 console.log('- ghPat.getExpiration()');
 console.log('- ghPat.setCustomExpirationDate("YYYY-MM-DD") // After selecting custom');
+console.log('- ghPat.setResourceOwner("owner-name") // Set resource owner');
+console.log('- ghPat.getResourceOwner()');
+console.log('- ghPat.getAvailableResourceOwners()');
