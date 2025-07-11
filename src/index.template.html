@@ -125,7 +125,8 @@
     <div class="preset">
         <h3>CI/CD Token (Read-only)</h3>
         <p>Suitable for continuous integration workflows that need to read code and download packages.</p>
-        <pre><code>ghPat.setRepositoryAccess('all');
+        <pre><code>ghPat.setExpiration(30); // 30 days expiration
+ghPat.setRepositoryAccess('all');
 ghPat.setMultiplePermissions({
   'contents': 'read',
   'metadata': 'read',
@@ -137,7 +138,8 @@ ghPat.setMultiplePermissions({
     <div class="preset">
         <h3>Development Token</h3>
         <p>For local development with ability to push code and manage issues/PRs.</p>
-        <pre><code>ghPat.setRepositoryAccess('selected');
+        <pre><code>ghPat.setExpiration(7); // 7 days for security
+ghPat.setRepositoryAccess('selected');
 ghPat.setMultiplePermissions({
   'contents': 'write',
   'issues': 'write',
@@ -150,7 +152,8 @@ ghPat.setMultiplePermissions({
     <div class="preset">
         <h3>Release Automation</h3>
         <p>For automated release workflows that need to create releases and upload packages.</p>
-        <pre><code>ghPat.setRepositoryAccess('selected');
+        <pre><code>ghPat.setExpiration(90); // 90 days for automation
+ghPat.setRepositoryAccess('selected');
 ghPat.setMultiplePermissions({
   'contents': 'write',
   'packages': 'write',
@@ -163,7 +166,8 @@ ghPat.setMultiplePermissions({
     <div class="preset">
         <h3>Admin Token</h3>
         <p>Full access for repository administration (use sparingly and rotate frequently).</p>
-        <pre><code>ghPat.setRepositoryAccess('selected');
+        <pre><code>ghPat.setExpiration(7); // Short expiration for admin tokens!
+ghPat.setRepositoryAccess('selected');
 ghPat.setMultiplePermissions({
   'administration': 'write',
   'contents': 'write',
@@ -185,6 +189,19 @@ ghPat.setMultiplePermissions({
                     <option value="none">Public repositories only</option>
                     <option value="all">All repositories</option>
                     <option value="selected">Selected repositories</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="permission-group">
+            <label>Token Expiration:
+                <select id="token-expiration" onchange="updateGeneratedCode()">
+                    <option value="7">7 days</option>
+                    <option value="30" selected>30 days</option>
+                    <option value="60">60 days</option>
+                    <option value="90">90 days</option>
+                    <option value="custom">Custom</option>
+                    <option value="none">No expiration</option>
                 </select>
             </label>
         </div>
@@ -272,6 +289,8 @@ ghPat.setMultiplePermissions({
         <li><code>ghPat.selectRepositories([repo1, repo2, ...])</code> - Select specific repositories</li>
         <li><code>ghPat.clearAllRepositories()</code> - Clear all selected repositories</li>
         <li><code>ghPat.getSelectedRepositories()</code> - Get list of currently selected repositories</li>
+        <li><code>ghPat.setExpiration(days)</code> - Set token expiration (7, 30, 60, 90, 'custom', or 'none')</li>
+        <li><code>ghPat.getExpiration()</code> - Get current expiration setting</li>
     </ul>
 
     <script>
@@ -284,6 +303,7 @@ ghPat.setMultiplePermissions({
         }
 
         function updateGeneratedCode() {
+            const expiration = document.getElementById('token-expiration').value;
             const repoAccess = document.getElementById('repo-access').value;
             const permissions = {};
             
@@ -295,7 +315,16 @@ ghPat.setMultiplePermissions({
                 }
             });
 
-            let code = `ghPat.setRepositoryAccess('${repoAccess}');\n`;
+            let code = '';
+            
+            // Add expiration setting
+            if (expiration === 'none' || expiration === 'custom') {
+                code += `ghPat.setExpiration('${expiration}');\n`;
+            } else {
+                code += `ghPat.setExpiration(${expiration});\n`;
+            }
+            
+            code += `ghPat.setRepositoryAccess('${repoAccess}');\n`;
             
             if (Object.keys(permissions).length > 0) {
                 code += 'ghPat.setMultiplePermissions({\n';

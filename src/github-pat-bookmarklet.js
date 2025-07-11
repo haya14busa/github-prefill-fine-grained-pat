@@ -345,6 +345,81 @@ window.ghPat.getSelectedRepositories = function() {
   return selectedRepos;
 }
 
+// Set token expiration
+window.ghPat.setExpiration = function(days) {
+  // days can be: 7, 30, 60, 90, 'custom', or 'none'
+  
+  // First, click the expiration dropdown button
+  const dropdownButton = document.querySelector('.js-new-default-token-expiration-select button[popovertarget]');
+  if (!dropdownButton) {
+    console.error('Expiration dropdown button not found');
+    return false;
+  }
+  
+  dropdownButton.click();
+  
+  // Wait a bit for dropdown to open
+  setTimeout(() => {
+    let targetButton;
+    
+    if (days === 'none') {
+      // Find the "No expiration" option
+      targetButton = Array.from(document.querySelectorAll('.js-new-default-token-expiration-item button'))
+        .find(btn => btn.textContent.includes('No expiration'));
+    } else if (days === 'custom') {
+      // Find the "Custom" option
+      targetButton = Array.from(document.querySelectorAll('.js-new-default-token-expiration-item button'))
+        .find(btn => btn.textContent.trim() === 'Custom');
+    } else if (typeof days === 'number') {
+      // Find the option with matching days
+      targetButton = document.querySelector(`.js-new-default-token-expiration-item button[data-value="${days}"]`);
+    }
+    
+    if (targetButton) {
+      targetButton.click();
+      console.log(`Set expiration to: ${days === 'none' ? 'No expiration' : days === 'custom' ? 'Custom' : `${days} days`}`);
+      
+      if (days === 'custom') {
+        console.log('Note: You will need to manually set the custom date');
+      }
+    } else {
+      console.error(`Expiration option not found: ${days}`);
+    }
+  }, 300);
+  
+  return true;
+}
+
+// Get current expiration setting
+window.ghPat.getExpiration = function() {
+  const dropdownButton = document.querySelector('.js-new-default-token-expiration-select button[popovertarget]');
+  if (!dropdownButton) {
+    console.error('Expiration dropdown button not found');
+    return null;
+  }
+  
+  const buttonText = dropdownButton.textContent.trim();
+  
+  if (buttonText.includes('No expiration')) {
+    console.log('Current expiration: No expiration');
+    return 'none';
+  } else if (buttonText.includes('Custom')) {
+    console.log('Current expiration: Custom');
+    return 'custom';
+  } else {
+    // Extract days from text like "30 days (Aug 10, 2025)"
+    const match = buttonText.match(/(\d+)\s+days/);
+    if (match) {
+      const days = parseInt(match[1]);
+      console.log(`Current expiration: ${days} days`);
+      return days;
+    }
+  }
+  
+  console.log('Could not determine current expiration');
+  return null;
+}
+
 // Example: Set repository access
 // ghPat.setRepositoryAccess('all'); // All repos
 // ghPat.setRepositoryAccess('selected'); // Selected repos only
@@ -364,3 +439,5 @@ console.log('- ghPat.getRepositoryAccess()');
 console.log('- ghPat.selectRepositories([repo1, repo2, ...])');
 console.log('- ghPat.clearAllRepositories()');
 console.log('- ghPat.getSelectedRepositories()');
+console.log('- ghPat.setExpiration(days) // 7, 30, 60, 90, "custom", or "none"');
+console.log('- ghPat.getExpiration()');

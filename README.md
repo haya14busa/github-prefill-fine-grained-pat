@@ -37,16 +37,16 @@ Then visit http://localhost:8080
 
 ```javascript
 // List all available permissions on the page
-listAvailablePermissions();
+ghPat.listAvailablePermissions();
 
 // Get current permission settings
-getCurrentPermissions();
+ghPat.getCurrentPermissions();
 
 // Set a single permission
-setPermission('contents', 'read');
+ghPat.setPermission('contents', 'read');
 
 // Set multiple permissions at once
-setMultiplePermissions({
+ghPat.setMultiplePermissions({
   'contents': 'read',
   'issues': 'write',
   'pull_requests': 'write'
@@ -57,21 +57,36 @@ setMultiplePermissions({
 
 ```javascript
 // Set repository access type
-setRepositoryAccess('all');      // All repositories
-setRepositoryAccess('selected'); // Selected repositories only
-setRepositoryAccess('none');     // Public repositories only
+ghPat.setRepositoryAccess('all');      // All repositories
+ghPat.setRepositoryAccess('selected'); // Selected repositories only
+ghPat.setRepositoryAccess('none');     // Public repositories only
 
 // Get current repository access setting
-getRepositoryAccess();
+ghPat.getRepositoryAccess();
 
 // Select specific repositories (when access is set to 'selected')
-selectRepositories(['owner/repo1', 'owner/repo2']);
+ghPat.selectRepositories(['owner/repo1', 'owner/repo2']);
 
 // Clear all selected repositories
-clearAllRepositories();
+ghPat.clearAllRepositories();
 
 // Get currently selected repositories
-getSelectedRepositories();
+ghPat.getSelectedRepositories();
+```
+
+### Token Expiration
+
+```javascript
+// Set token expiration
+ghPat.setExpiration(7);        // 7 days
+ghPat.setExpiration(30);       // 30 days (default)
+ghPat.setExpiration(60);       // 60 days
+ghPat.setExpiration(90);       // 90 days
+ghPat.setExpiration('custom'); // Custom date (manual selection required)
+ghPat.setExpiration('none');   // No expiration
+
+// Get current expiration setting
+ghPat.getExpiration(); // Returns: 7, 30, 60, 90, 'custom', 'none', or null
 ```
 
 ### Permission Values
