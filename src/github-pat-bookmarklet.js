@@ -721,8 +721,16 @@ window.ghPat.applyFromUrlParams = async function() {
     if (config.expiration) {
       if (config.expiration === 'custom' && config.expirationDate) {
         window.ghPat.setExpiration('custom', config.expirationDate);
+      } else if (config.expiration === 'none') {
+        window.ghPat.setExpiration('none');
       } else {
-        window.ghPat.setExpiration(config.expiration);
+        // Convert string to number for numeric expiration days
+        const expirationDays = parseInt(config.expiration, 10);
+        if (!isNaN(expirationDays)) {
+          window.ghPat.setExpiration(expirationDays);
+        } else {
+          console.error(`Invalid expiration value: ${config.expiration}`);
+        }
       }
       await new Promise(resolve => setTimeout(resolve, 500));
     }
