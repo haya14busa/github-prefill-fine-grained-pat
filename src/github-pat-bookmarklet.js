@@ -534,9 +534,9 @@ window.ghPat.setExpiration = function(days, customDate) {
       targetButton = Array.from(document.querySelectorAll('.js-new-default-token-expiration-item button'))
         .find(btn => btn.textContent.includes('No expiration'));
     } else if (days === 'custom') {
-      // Find the "Custom" option
+      // Find the "Custom" option (might have additional text like "between 1 and 366 days")
       targetButton = Array.from(document.querySelectorAll('.js-new-default-token-expiration-item button'))
-        .find(btn => btn.textContent.trim() === 'Custom');
+        .find(btn => btn.textContent.trim().startsWith('Custom'));
     } else if (typeof days === 'number') {
       // Find the option with matching days
       targetButton = document.querySelector(`.js-new-default-token-expiration-item button[data-value="${days}"]`);
