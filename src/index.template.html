@@ -125,7 +125,9 @@
     <div class="preset">
         <h3>CI/CD Token (Read-only)</h3>
         <p>Suitable for continuous integration workflows that need to read code and download packages.</p>
-        <pre><code>ghPat.setExpiration(30); // 30 days expiration
+        <pre><code>ghPat.setTokenName('CI/CD Read-only Token');
+ghPat.setTokenDescription('Automated CI/CD workflow - read access only');
+ghPat.setExpiration(30); // 30 days expiration
 ghPat.setRepositoryAccess('all');
 ghPat.setMultiplePermissions({
   'contents': 'read',
@@ -323,6 +325,10 @@ ghPat.setMultiplePermissions({
     <h2>📚 Usage Guide</h2>
     <h3>Available Functions</h3>
     <ul>
+        <li><code>ghPat.setTokenName(name)</code> - Set the token name</li>
+        <li><code>ghPat.getTokenName()</code> - Get current token name</li>
+        <li><code>ghPat.setTokenDescription(description)</code> - Set the token description</li>
+        <li><code>ghPat.getTokenDescription()</code> - Get current token description</li>
         <li><code>ghPat.setPermission(resource, level)</code> - Set a single permission</li>
         <li><code>ghPat.setMultiplePermissions({resource: level, ...})</code> - Set multiple permissions at once</li>
         <li><code>ghPat.listAvailablePermissions()</code> - List all available permissions on the page</li>

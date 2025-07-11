@@ -33,6 +33,22 @@ Then visit http://localhost:8080
 
 ## Usage
 
+### Token Name and Description
+
+```javascript
+// Set token name
+ghPat.setTokenName('CI/CD Token for Production');
+
+// Get current token name
+ghPat.getTokenName(); // Returns: 'CI/CD Token for Production'
+
+// Set token description
+ghPat.setTokenDescription('Used for automated deployments and testing in production environment');
+
+// Get current token description
+ghPat.getTokenDescription();
+```
+
 ### Resource Owner
 
 ```javascript

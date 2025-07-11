@@ -4,6 +4,62 @@
 // Create global object for bookmarklet
 window.ghPat = window.ghPat || {};
 
+// Set token name
+window.ghPat.setTokenName = function(name) {
+  const nameInput = document.getElementById('user_programmatic_access_name');
+  if (!nameInput) {
+    console.error('Token name input not found');
+    return false;
+  }
+  
+  nameInput.value = name;
+  nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+  nameInput.dispatchEvent(new Event('change', { bubbles: true }));
+  console.log(`Set token name to: ${name}`);
+  return true;
+}
+
+// Get current token name
+window.ghPat.getTokenName = function() {
+  const nameInput = document.getElementById('user_programmatic_access_name');
+  if (!nameInput) {
+    console.error('Token name input not found');
+    return null;
+  }
+  
+  const name = nameInput.value;
+  console.log(`Current token name: ${name || '(empty)'}`);
+  return name;
+}
+
+// Set token description
+window.ghPat.setTokenDescription = function(description) {
+  const descriptionTextarea = document.getElementById('user_programmatic_access_description');
+  if (!descriptionTextarea) {
+    console.error('Token description textarea not found');
+    return false;
+  }
+  
+  descriptionTextarea.value = description;
+  descriptionTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+  descriptionTextarea.dispatchEvent(new Event('change', { bubbles: true }));
+  console.log(`Set token description to: ${description}`);
+  return true;
+}
+
+// Get current token description
+window.ghPat.getTokenDescription = function() {
+  const descriptionTextarea = document.getElementById('user_programmatic_access_description');
+  if (!descriptionTextarea) {
+    console.error('Token description textarea not found');
+    return null;
+  }
+  
+  const description = descriptionTextarea.value;
+  console.log(`Current token description: ${description || '(empty)'}`);
+  return description;
+}
+
 window.ghPat.setPermission = function(resourceName, accessLevel) {
   // Find permission rows by resource name
   const permissionRows = document.querySelectorAll('li.js-list-group-item');
@@ -534,7 +590,15 @@ window.ghPat.getAvailableResourceOwners = function() {
   // Wait for dropdown to load and collect owners
   setTimeout(() => {
     const owners = [];
-    const ownerButtons = document.querySelectorAll('.ActionListItem button[data-value]');
+    // More specific selector: only buttons within the resource owner dialog
+    const ownerDialog = document.getElementById('resource-owner-select-panel-dialog');
+    if (!ownerDialog) {
+      console.error('Resource owner dialog not found');
+      return [];
+    }
+    
+    // Get buttons specifically within the resource owner dialog
+    const ownerButtons = ownerDialog.querySelectorAll('.ActionListItem button[data-value]');
     
     ownerButtons.forEach(button => {
       const value = button.getAttribute('data-value');
@@ -573,6 +637,10 @@ window.ghPat.getAvailableResourceOwners = function() {
 
 // Log initialization message
 console.log('GitHub PAT Helper loaded! Available functions:');
+console.log('- ghPat.setTokenName(name)');
+console.log('- ghPat.getTokenName()');
+console.log('- ghPat.setTokenDescription(description)');
+console.log('- ghPat.getTokenDescription()');
 console.log('- ghPat.setPermission(resource, level)');
 console.log('- ghPat.setMultiplePermissions({resource: level, ...})');
 console.log('- ghPat.listAvailablePermissions()');
