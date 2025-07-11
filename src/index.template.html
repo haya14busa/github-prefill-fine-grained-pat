@@ -218,10 +218,16 @@
         <li><code>name</code> - Token name</li>
         <li><code>description</code> - Token description</li>
         <li><code>owner</code> - Resource owner</li>
-        <li><code>expiration</code> - Expiration (7, 30, 60, 90, custom, none)</li>
-        <li><code>expiration_date</code> - Custom date (YYYY-MM-DD)</li>
+        <li><code>expiration</code> - Expiration days
+            <ul>
+                <li>Standard options: 7, 30, 60, 90</li>
+                <li>Special values: "custom", "none"</li>
+                <li>Any number (e.g., 1, 14, 365) - automatically converted to custom date</li>
+            </ul>
+        </li>
+        <li><code>expiration_date</code> - Custom date (YYYY-MM-DD) when expiration=custom</li>
         <li><code>repo_access</code> - Repository access (none, all, selected)</li>
-        <li><code>repos</code> - Repositories (comma-separated)</li>
+        <li><code>repos</code> - Repositories (comma-separated, supports both "repo" and "owner/repo" formats)</li>
         <li><code>permissions</code> - Permissions (format: resource:level,resource:level)</li>
     </ul>
 
