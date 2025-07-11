@@ -218,19 +218,31 @@ function selectRepositories(repoNames) {
     setRepositoryAccess('selected');
   }
   
-  // Wait for repository picker to load
-  waitForRepositoryPicker(() => {
-    // Clear any existing selections first
-    clearAllRepositories();
+  // Open the repository picker by clicking the button
+  setTimeout(() => {
+    const selectButton = document.querySelector('#repository-menu-list');
+    if (!selectButton) {
+      console.error('Repository picker button not found');
+      return;
+    }
     
-    // Add each repository
-    let delay = 500; // Initial delay to ensure UI is ready
-    repoNames.forEach((repoName, index) => {
-      setTimeout(() => {
-        addRepository(repoName);
-      }, delay + (index * 300));
+    selectButton.click();
+    console.log('Opening repository picker...');
+    
+    // Wait for repository picker to load
+    waitForRepositoryPicker(() => {
+      // Clear any existing selections first
+      clearAllRepositories();
+      
+      // Add each repository
+      let delay = 500; // Initial delay to ensure UI is ready
+      repoNames.forEach((repoName, index) => {
+        setTimeout(() => {
+          addRepository(repoName);
+        }, delay + (index * 300));
+      });
     });
-  });
+  }, 500); // Wait a bit after setting repository access to 'selected'
 }
 
 // Add a single repository to the selection

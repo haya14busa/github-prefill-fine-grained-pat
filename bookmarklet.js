@@ -159,15 +159,24 @@ javascript:(function(){
         console.log('Setting repository access to "selected" first...');
         this.setRepositoryAccess('selected');
       }
-      this.waitForRepositoryPicker(() => {
-        this.clearAllRepositories();
-        let delay = 500;
-        repoNames.forEach((repoName, index) => {
-          setTimeout(() => {
-            this.addRepository(repoName);
-          }, delay + (index * 300));
+      setTimeout(() => {
+        const selectButton = document.querySelector('#repository-menu-list');
+        if (!selectButton) {
+          console.error('Repository picker button not found');
+          return;
+        }
+        selectButton.click();
+        console.log('Opening repository picker...');
+        this.waitForRepositoryPicker(() => {
+          this.clearAllRepositories();
+          let delay = 500;
+          repoNames.forEach((repoName, index) => {
+            setTimeout(() => {
+              this.addRepository(repoName);
+            }, delay + (index * 300));
+          });
         });
-      });
+      }, 500);
     },
     
     addRepository: function(repoName) {
