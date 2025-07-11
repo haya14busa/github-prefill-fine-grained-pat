@@ -449,21 +449,28 @@ window.ghPat.addRepository = async function(repoName, maxRetries = 5) {
     
     for (const button of repoButtons) {
       const repoText = button.textContent.trim();
-      if (repoText.includes(repoName)) {
-        button.click();
-        console.log(`Clicked repository: ${repoName}`);
-        found = true;
-        
-        // Wait for the repository to appear in the selected list
-        try {
-          await window.ghPat.waitForRepositoryInList(repoName);
-          return; // Success!
-        } catch (error) {
-          console.error(`Repository ${repoName} was clicked but didn't appear in list:`, error);
-          // Continue to retry
-          found = false;
+      // Extract owner and repo from the button text
+      // Format is typically "owner/repo" or might have additional text
+      const match = repoText.match(/^(.+?)\/(.+?)(?:\s|$)/);
+      if (match) {
+        const [, buttonOwner, buttonRepo] = match;
+        // Check for exact match of repository name
+        if (buttonRepo === repoName) {
+          button.click();
+          console.log(`Clicked repository: ${buttonOwner}/${buttonRepo}`);
+          found = true;
+          
+          // Wait for the repository to appear in the selected list
+          try {
+            await window.ghPat.waitForRepositoryInList(repoName);
+            return; // Success!
+          } catch (error) {
+            console.error(`Repository ${repoName} was clicked but didn't appear in list:`, error);
+            // Continue to retry
+            found = false;
+          }
+          break;
         }
-        break;
       }
     }
     
