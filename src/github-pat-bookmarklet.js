@@ -513,37 +513,78 @@ window.ghPat.setCustomExpirationDate = function(date) {
 
 // Set resource owner (user or organization)
 window.ghPat.setResourceOwner = function(ownerName) {
-  // Click the resource owner dropdown button
-  const dropdownButton = document.getElementById('resource-owner-select-panel-button');
-  if (!dropdownButton) {
-    console.error('Resource owner dropdown button not found');
-    return false;
-  }
-  
-  dropdownButton.click();
-  
-  // Wait for dropdown to open
-  setTimeout(() => {
-    // Find the owner in the list
-    const ownerButtons = document.querySelectorAll('.ActionListItem button[data-value]');
-    let found = false;
+  return new Promise((resolve, reject) => {
+    // Click the resource owner dropdown button
+    const dropdownButton = document.getElementById('resource-owner-select-panel-button');
+    if (!dropdownButton) {
+      console.error('Resource owner dropdown button not found');
+      reject(new Error('Resource owner dropdown button not found'));
+      return;
+    }
     
-    for (const button of ownerButtons) {
-      if (button.getAttribute('data-value') === ownerName) {
-        button.click();
-        console.log(`Set resource owner to: ${ownerName}`);
-        found = true;
-        break;
+    dropdownButton.click();
+    
+    // Wait for dropdown to open
+    setTimeout(() => {
+      // Find the owner in the list
+      const ownerButtons = document.querySelectorAll('.ActionListItem button[data-value]');
+      let found = false;
+      
+      for (const button of ownerButtons) {
+        if (button.getAttribute('data-value') === ownerName) {
+          button.click();
+          console.log(`Clicked resource owner: ${ownerName}`);
+          found = true;
+          
+          // Wait and verify the owner was set
+          window.ghPat.waitForResourceOwner(ownerName)
+            .then(() => {
+              console.log(`Resource owner successfully set to: ${ownerName}`);
+              resolve(true);
+            })
+            .catch(reject);
+          break;
+        }
       }
-    }
+      
+      if (!found) {
+        const error = `Resource owner not found: ${ownerName}`;
+        console.error(error);
+        console.log('Hint: Available owners can be listed with getAvailableResourceOwners()');
+        reject(new Error(error));
+      }
+    }, 300);
+  });
+}
+
+// Wait for resource owner to be set in the UI
+window.ghPat.waitForResourceOwner = function(expectedOwner, maxRetries = 20) {
+  return new Promise((resolve, reject) => {
+    let retries = 0;
     
-    if (!found) {
-      console.error(`Resource owner not found: ${ownerName}`);
-      console.log('Hint: Available owners can be listed with getAvailableResourceOwners()');
-    }
-  }, 300);
-  
-  return true;
+    const checkOwner = () => {
+      const dropdownButton = document.getElementById('resource-owner-select-panel-button');
+      if (!dropdownButton) {
+        reject(new Error('Resource owner dropdown button not found'));
+        return;
+      }
+      
+      const buttonText = dropdownButton.textContent || '';
+      if (buttonText.includes(expectedOwner)) {
+        resolve();
+      } else {
+        retries++;
+        if (retries >= maxRetries) {
+          reject(new Error(`Resource owner not set after ${maxRetries} attempts. Expected: ${expectedOwner}, Current button text: ${buttonText}`));
+        } else {
+          setTimeout(checkOwner, 200);
+        }
+      }
+    };
+    
+    // Start checking after a small delay
+    setTimeout(checkOwner, 200);
+  });
 }
 
 // Get current resource owner
@@ -734,8 +775,8 @@ window.ghPat.applyFromUrlParams = async function() {
     
     // Set resource owner first (repository access and permissions depend on this)
     if (config.owner) {
-      window.ghPat.setResourceOwner(config.owner);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Give more time for owner change
+      await window.ghPat.setResourceOwner(config.owner);
+      // No need for additional wait - setResourceOwner now waits for confirmation
     }
     
     // Repository access and permissions depend on resource owner being set
@@ -858,7 +899,7 @@ console.log('- ghPat.setExpiration(days) // 7, 30, 60, 90, "custom", or "none"')
 console.log('- ghPat.setExpiration("custom", "2025-12-31") // Set custom date');
 console.log('- ghPat.getExpiration()');
 console.log('- ghPat.setCustomExpirationDate("YYYY-MM-DD") // After selecting custom');
-console.log('- ghPat.setResourceOwner("owner-name") // Set resource owner');
+console.log('- ghPat.setResourceOwner("owner-name") // Set resource owner (returns Promise)');
 console.log('- ghPat.getResourceOwner()');
 console.log('- ghPat.getAvailableResourceOwners()');
 console.log('- ghPat.applyFromUrlParams() // Apply configuration from URL parameters');

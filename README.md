@@ -53,8 +53,9 @@ ghPat.getTokenDescription();
 
 ```javascript
 // Set resource owner (personal account or organization)
-ghPat.setResourceOwner('haya14busa');     // Personal account
-ghPat.setResourceOwner('my-org');         // Organization
+// Note: setResourceOwner returns a Promise and waits for confirmation
+await ghPat.setResourceOwner('haya14busa');     // Personal account
+await ghPat.setResourceOwner('my-org');         // Organization
 
 // Get current resource owner
 ghPat.getResourceOwner(); // Returns: 'haya14busa'
