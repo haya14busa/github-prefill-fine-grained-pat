@@ -191,7 +191,7 @@ javascript:(function(){
       }, 500);
     },
     
-    addRepository: function(repoName) {
+    addRepository: function(repoName, maxRetries = 5) {
       const searchInput = document.querySelector('#repository-menu-list-filter');
       if (!searchInput) {
         console.error('Repository search input not found. Make sure the picker is open.');
@@ -201,7 +201,9 @@ javascript:(function(){
       searchInput.dispatchEvent(new Event('input', { bubbles: true }));
       searchInput.value = repoName;
       searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-      setTimeout(() => {
+      
+      let retryCount = 0;
+      const trySelectRepo = () => {
         const repoButtons = document.querySelectorAll('button[role="option"]');
         let found = false;
         for (const button of repoButtons) {
@@ -214,9 +216,17 @@ javascript:(function(){
           }
         }
         if (!found) {
-          console.error(`Repository not found: ${repoName}`);
+          retryCount++;
+          if (retryCount < maxRetries) {
+            console.log(`Repository ${repoName} not found yet, retrying... (${retryCount}/${maxRetries})`);
+            setTimeout(trySelectRepo, 300);
+          } else {
+            console.error(`Repository not found after ${maxRetries} attempts: ${repoName}`);
+          }
         }
-      }, 500);
+      };
+      
+      setTimeout(trySelectRepo, 500);
     },
     
     clearAllRepositories: function() {

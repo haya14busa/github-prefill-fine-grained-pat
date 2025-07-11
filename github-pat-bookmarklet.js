@@ -261,7 +261,7 @@ function selectRepositories(repoNames) {
 }
 
 // Add a single repository to the selection
-function addRepository(repoName) {
+function addRepository(repoName, maxRetries = 5) {
   // Find the search input (assumes picker is already open)
   const searchInput = document.querySelector('#repository-menu-list-filter');
   if (!searchInput) {
@@ -277,8 +277,9 @@ function addRepository(repoName) {
   searchInput.value = repoName;
   searchInput.dispatchEvent(new Event('input', { bubbles: true }));
   
-  // Wait for search results and click the matching repository
-  setTimeout(() => {
+  // Retry logic for finding and clicking the repository
+  let retryCount = 0;
+  const trySelectRepo = () => {
     // Find the repository in the list
     const repoButtons = document.querySelectorAll('button[role="option"]');
     let found = false;
@@ -294,9 +295,18 @@ function addRepository(repoName) {
     }
     
     if (!found) {
-      console.error(`Repository not found: ${repoName}`);
+      retryCount++;
+      if (retryCount < maxRetries) {
+        console.log(`Repository ${repoName} not found yet, retrying... (${retryCount}/${maxRetries})`);
+        setTimeout(trySelectRepo, 300); // Retry after 300ms
+      } else {
+        console.error(`Repository not found after ${maxRetries} attempts: ${repoName}`);
+      }
     }
-  }, 500); // Wait for search results
+  };
+  
+  // Start trying after initial delay
+  setTimeout(trySelectRepo, 500);
 }
 
 // Clear all selected repositories
