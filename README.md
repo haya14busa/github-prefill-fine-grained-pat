@@ -150,6 +150,9 @@ ghPat.copyConfigUrl();
 
 // Open configuration URL in new tab
 ghPat.openConfigUrl();
+
+// Update current URL with configuration (without reloading)
+ghPat.updateUrlParams();
 ```
 
 When you visit a GitHub PAT creation page with URL parameters and run the bookmarklet, it will automatically apply the configuration.

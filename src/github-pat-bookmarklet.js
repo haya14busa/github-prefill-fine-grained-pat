@@ -1024,6 +1024,73 @@ window.ghPat.openConfigUrl = function() {
   return url;
 }
 
+// Update current URL with configuration parameters
+window.ghPat.updateUrlParams = function() {
+  const params = new URLSearchParams();
+  
+  // Get current token name
+  const name = window.ghPat.getTokenName();
+  if (name) {
+    params.set('name', name);
+  }
+  
+  // Get current description
+  const description = window.ghPat.getTokenDescription();
+  if (description) {
+    params.set('description', description);
+  }
+  
+  // Get current owner
+  const owner = window.ghPat.getResourceOwner();
+  if (owner) {
+    params.set('owner', owner);
+  }
+  
+  // Get expiration
+  const expiration = window.ghPat.getExpiration();
+  if (expiration) {
+    if (expiration.type === 'days') {
+      params.set('expiration', expiration.days.toString());
+    } else if (expiration.type === 'custom' && expiration.date) {
+      params.set('expiration', 'custom');
+      params.set('expiration_date', expiration.date);
+    } else if (expiration.type === 'none') {
+      params.set('expiration', 'none');
+    }
+  }
+  
+  // Get repository access
+  const repoAccess = window.ghPat.getRepositoryAccess();
+  if (repoAccess) {
+    params.set('repo_access', repoAccess);
+  }
+  
+  // Get selected repositories
+  if (repoAccess === 'selected') {
+    const repos = window.ghPat.getSelectedRepositories();
+    if (repos && repos.length > 0) {
+      params.set('repos', repos.join(','));
+    }
+  }
+  
+  // Get permissions
+  const permissions = window.ghPat.getCurrentPermissions();
+  if (permissions && Object.keys(permissions).length > 0) {
+    const permsArray = Object.entries(permissions).map(([resource, level]) => `${resource}:${level}`);
+    params.set('permissions', permsArray.join(','));
+  }
+  
+  // Update URL without reloading the page
+  const newUrl = params.toString() ? 
+    `${window.location.pathname}?${params.toString()}` : 
+    window.location.pathname;
+  
+  window.history.replaceState({}, '', newUrl);
+  console.log('URL updated with current configuration');
+  
+  return window.location.href;
+}
+
 // Log initialization message
 console.log('GitHub PAT Helper loaded! Available functions:');
 console.log('- ghPat.setTokenName(name)');
@@ -1050,6 +1117,7 @@ console.log('- ghPat.applyFromUrlParams() // Apply configuration from URL parame
 console.log('- ghPat.generateConfigUrl() // Generate URL with current configuration');
 console.log('- ghPat.copyConfigUrl() // Copy configuration URL to clipboard');
 console.log('- ghPat.openConfigUrl() // Open configuration URL in new tab');
+console.log('- ghPat.updateUrlParams() // Update current URL with configuration');
 
 // Auto-apply URL parameters if present
 if (window.location.search) {
