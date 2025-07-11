@@ -449,7 +449,10 @@ window.ghPat.getSelectedRepositories = function() {
   const repoElements = document.querySelectorAll('.js-repository-picker-result .repo-and-owner');
   
   repoElements.forEach(element => {
-    const repoName = element.textContent.trim();
+    const fullName = element.textContent.trim();
+    // Extract just the repository name (remove owner prefix)
+    const parts = fullName.split('/');
+    const repoName = parts.length > 1 ? parts[parts.length - 1] : fullName;
     selectedRepos.push(repoName);
   });
   
@@ -772,7 +775,15 @@ window.ghPat.applyFromUrlParams = async function() {
   }
   
   if (urlParams.has('repos')) {
-    config.repos = urlParams.get('repos').split(',').filter(r => r.trim());
+    // Parse repos and strip owner prefix if present (owner/repo -> repo)
+    config.repos = urlParams.get('repos').split(',')
+      .map(r => r.trim())
+      .map(r => {
+        // Handle owner/repo format by extracting just the repo name
+        const parts = r.split('/');
+        return parts.length > 1 ? parts[parts.length - 1] : r;
+      })
+      .filter(r => r);
     hasConfig = true;
   }
   

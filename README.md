@@ -168,7 +168,7 @@ When you run the bookmarklet, it automatically decides what to do:
 - `expiration` - Expiration days (7, 30, 60, 90, "custom", or "none")
 - `expiration_date` - Custom expiration date (YYYY-MM-DD) when expiration=custom
 - `repo_access` - Repository access type ("none", "all", or "selected")
-- `repos` - Comma-separated list of repositories (when repo_access=selected)
+- `repos` - Comma-separated list of repositories (when repo_access=selected, supports both `repo` and `owner/repo` formats)
 - `permissions` - Comma-separated permission pairs (format: `resource:level`)
 
 #### Example URLs
@@ -177,8 +177,9 @@ When you run the bookmarklet, it automatically decides what to do:
 # Basic CI/CD token
 https://github.com/settings/personal-access-tokens/new?name=CI+Token&expiration=30&repo_access=all&permissions=contents:read,metadata:read
 
-# Organization token with specific repos
+# Organization token with specific repos (both formats work)
 https://github.com/settings/personal-access-tokens/new?owner=my-org&name=Deploy+Token&repo_access=selected&repos=api,frontend&permissions=contents:write,packages:write
+https://github.com/settings/personal-access-tokens/new?owner=my-org&name=Deploy+Token&repo_access=selected&repos=my-org/api,my-org/frontend&permissions=contents:write,packages:write
 
 # Custom expiration date
 https://github.com/settings/personal-access-tokens/new?name=Long+Term+Token&expiration=custom&expiration_date=2025-12-31
