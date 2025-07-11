@@ -165,7 +165,7 @@ When you run the bookmarklet, it automatically decides what to do:
 - `name` - Token name
 - `description` - Token description
 - `owner` - Resource owner (username or organization)
-- `expiration` - Expiration days (7, 30, 60, 90, "custom", or "none")
+- `expiration` - Expiration days (7, 30, 60, 90, "custom", "none", or any number for custom days)
 - `expiration_date` - Custom expiration date (YYYY-MM-DD) when expiration=custom
 - `repo_access` - Repository access type ("none", "all", or "selected")
 - `repos` - Comma-separated list of repositories (when repo_access=selected, supports both `repo` and `owner/repo` formats)
@@ -183,6 +183,10 @@ https://github.com/settings/personal-access-tokens/new?owner=my-org&name=Deploy+
 
 # Custom expiration date
 https://github.com/settings/personal-access-tokens/new?name=Long+Term+Token&expiration=custom&expiration_date=2025-12-31
+
+# Non-standard expiration days (e.g., 1 day, 14 days)
+https://github.com/settings/personal-access-tokens/new?name=Short+Token&expiration=1
+https://github.com/settings/personal-access-tokens/new?name=Two+Week+Token&expiration=14
 ```
 
 ## Preset Configurations

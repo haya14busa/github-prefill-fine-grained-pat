@@ -908,7 +908,17 @@ window.ghPat.applyFromUrlParams = async function() {
         // Convert string to number for numeric expiration days
         const expirationDays = parseInt(config.expiration, 10);
         if (!isNaN(expirationDays)) {
-          window.ghPat.setExpiration(expirationDays);
+          // Check if it's a standard expiration option
+          if ([7, 30, 60, 90].includes(expirationDays)) {
+            window.ghPat.setExpiration(expirationDays);
+          } else {
+            // Non-standard days - calculate custom date
+            const customDate = new Date();
+            customDate.setDate(customDate.getDate() + expirationDays);
+            const dateStr = customDate.toISOString().split('T')[0];
+            console.log(`Non-standard expiration ${expirationDays} days, using custom date: ${dateStr}`);
+            window.ghPat.setExpiration('custom', dateStr);
+          }
         } else {
           console.error(`Invalid expiration value: ${config.expiration}`);
         }
