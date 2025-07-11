@@ -915,7 +915,11 @@ window.ghPat.applyFromUrlParams = async function() {
             // Non-standard days - calculate custom date
             const customDate = new Date();
             customDate.setDate(customDate.getDate() + expirationDays);
-            const dateStr = customDate.toISOString().split('T')[0];
+            // Format as YYYY-MM-DD in local timezone
+            const year = customDate.getFullYear();
+            const month = String(customDate.getMonth() + 1).padStart(2, '0');
+            const day = String(customDate.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
             console.log(`Non-standard expiration ${expirationDays} days, using custom date: ${dateStr}`);
             window.ghPat.setExpiration('custom', dateStr);
           }
