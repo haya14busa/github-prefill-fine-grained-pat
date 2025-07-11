@@ -320,6 +320,10 @@ ghPat.setMultiplePermissions({
         <h4>Generated Code:</h4>
         <pre id="generated-code"></pre>
         <button onclick="copyToClipboard(document.getElementById('generated-code').textContent)">Copy Code</button>
+        
+        <h4 style="margin-top: 20px;">Shareable URL:</h4>
+        <pre id="generated-url" style="word-wrap: break-word; white-space: pre-wrap;"></pre>
+        <button onclick="copyToClipboard(document.getElementById('generated-url').textContent)">Copy URL</button>
     </div>
 
     <h2>📚 Usage Guide</h2>
@@ -345,6 +349,26 @@ ghPat.setMultiplePermissions({
         <li><code>ghPat.setResourceOwner('owner-name')</code> - Set resource owner (user or organization)</li>
         <li><code>ghPat.getResourceOwner()</code> - Get current resource owner</li>
         <li><code>ghPat.getAvailableResourceOwners()</code> - List available resource owners</li>
+        <li><code>ghPat.applyFromUrlParams()</code> - Apply configuration from URL parameters</li>
+        <li><code>ghPat.generateConfigUrl()</code> - Generate URL with current configuration</li>
+    </ul>
+
+    <h3>URL Parameter Configuration</h3>
+    <p>You can share token configurations using URL parameters. The tool will automatically detect and offer to apply them.</p>
+    
+    <h4>Example URL</h4>
+    <pre><code>https://github.com/settings/personal-access-tokens/new?name=CI+Token&expiration=30&repo_access=all&permissions=contents:read,metadata:read</code></pre>
+    
+    <h4>Supported Parameters</h4>
+    <ul>
+        <li><code>name</code> - Token name</li>
+        <li><code>description</code> - Token description</li>
+        <li><code>owner</code> - Resource owner</li>
+        <li><code>expiration</code> - Expiration (7, 30, 60, 90, custom, none)</li>
+        <li><code>expiration_date</code> - Custom date (YYYY-MM-DD)</li>
+        <li><code>repo_access</code> - Repository access (none, all, selected)</li>
+        <li><code>repos</code> - Repositories (comma-separated)</li>
+        <li><code>permissions</code> - Permissions (format: resource:level,resource:level)</li>
     </ul>
 
     <script>
@@ -370,6 +394,7 @@ ghPat.setMultiplePermissions({
                 }
             });
 
+            // Generate code
             let code = '';
             
             // Add resource owner if specified
@@ -403,6 +428,36 @@ ghPat.setMultiplePermissions({
             }
 
             document.getElementById('generated-code').textContent = code;
+            
+            // Generate shareable URL
+            const params = new URLSearchParams();
+            const baseUrl = 'https://github.com/settings/personal-access-tokens/new';
+            
+            if (resourceOwner) {
+                params.set('owner', resourceOwner);
+            }
+            
+            if (expiration === 'none') {
+                params.set('expiration', 'none');
+            } else if (expiration === 'custom') {
+                const customDate = document.getElementById('custom-date').value;
+                if (customDate) {
+                    params.set('expiration', 'custom');
+                    params.set('expiration_date', customDate);
+                }
+            } else {
+                params.set('expiration', expiration);
+            }
+            
+            params.set('repo_access', repoAccess);
+            
+            if (Object.keys(permissions).length > 0) {
+                const permsArray = Object.entries(permissions).map(([resource, level]) => `${resource}:${level}`);
+                params.set('permissions', permsArray.join(','));
+            }
+            
+            const shareableUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+            document.getElementById('generated-url').textContent = shareableUrl;
         }
 
         function toggleCustomDate() {

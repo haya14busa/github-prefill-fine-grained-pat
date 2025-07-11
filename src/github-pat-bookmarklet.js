@@ -635,6 +635,184 @@ window.ghPat.getAvailableResourceOwners = function() {
 // Example: Select specific repositories
 // ghPat.selectRepositories(['myrepo', 'another-repo', 'third-repo']);
 
+// Parse URL parameters and apply configuration
+window.ghPat.applyFromUrlParams = async function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const config = {};
+  let hasConfig = false;
+
+  // Parse all supported parameters
+  if (urlParams.has('name')) {
+    config.name = urlParams.get('name');
+    hasConfig = true;
+  }
+  
+  if (urlParams.has('description')) {
+    config.description = urlParams.get('description');
+    hasConfig = true;
+  }
+  
+  if (urlParams.has('owner')) {
+    config.owner = urlParams.get('owner');
+    hasConfig = true;
+  }
+  
+  if (urlParams.has('expiration')) {
+    config.expiration = urlParams.get('expiration');
+    hasConfig = true;
+  }
+  
+  if (urlParams.has('expiration_date')) {
+    config.expirationDate = urlParams.get('expiration_date');
+    hasConfig = true;
+  }
+  
+  if (urlParams.has('repo_access')) {
+    config.repoAccess = urlParams.get('repo_access');
+    hasConfig = true;
+  }
+  
+  if (urlParams.has('repos')) {
+    config.repos = urlParams.get('repos').split(',').filter(r => r.trim());
+    hasConfig = true;
+  }
+  
+  // Parse permissions (format: permissions=contents:read,issues:write)
+  if (urlParams.has('permissions')) {
+    config.permissions = {};
+    const permsString = urlParams.get('permissions');
+    permsString.split(',').forEach(perm => {
+      const [resource, level] = perm.split(':');
+      if (resource && level) {
+        config.permissions[resource.trim()] = level.trim();
+      }
+    });
+    hasConfig = true;
+  }
+
+  if (!hasConfig) {
+    console.log('No configuration found in URL parameters');
+    return false;
+  }
+
+  console.log('Applying configuration from URL parameters:', config);
+
+  // Apply configuration in order
+  try {
+    // Set token name
+    if (config.name) {
+      window.ghPat.setTokenName(config.name);
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    // Set description
+    if (config.description) {
+      window.ghPat.setTokenDescription(config.description);
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    // Set resource owner
+    if (config.owner) {
+      window.ghPat.setResourceOwner(config.owner);
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // Set expiration
+    if (config.expiration) {
+      if (config.expiration === 'custom' && config.expirationDate) {
+        window.ghPat.setExpiration('custom', config.expirationDate);
+      } else {
+        window.ghPat.setExpiration(config.expiration);
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // Set repository access
+    if (config.repoAccess) {
+      window.ghPat.setRepositoryAccess(config.repoAccess);
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // Select repositories if specified
+    if (config.repos && config.repos.length > 0) {
+      await window.ghPat.selectRepositories(config.repos);
+    }
+    
+    // Set permissions
+    if (config.permissions && Object.keys(config.permissions).length > 0) {
+      window.ghPat.setMultiplePermissions(config.permissions);
+    }
+    
+    console.log('Configuration applied successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error applying configuration:', error);
+    return false;
+  }
+}
+
+// Generate URL with current configuration
+window.ghPat.generateConfigUrl = function() {
+  const params = new URLSearchParams();
+  const baseUrl = window.location.origin + window.location.pathname;
+  
+  // Get current token name
+  const name = window.ghPat.getTokenName();
+  if (name) {
+    params.set('name', name);
+  }
+  
+  // Get current description
+  const description = window.ghPat.getTokenDescription();
+  if (description) {
+    params.set('description', description);
+  }
+  
+  // Get current owner
+  const owner = window.ghPat.getResourceOwner();
+  if (owner) {
+    params.set('owner', owner);
+  }
+  
+  // Get expiration
+  const expiration = window.ghPat.getExpiration();
+  if (expiration) {
+    if (expiration.type === 'days') {
+      params.set('expiration', expiration.days.toString());
+    } else if (expiration.type === 'custom' && expiration.date) {
+      params.set('expiration', 'custom');
+      params.set('expiration_date', expiration.date);
+    } else if (expiration.type === 'none') {
+      params.set('expiration', 'none');
+    }
+  }
+  
+  // Get repository access
+  const repoAccess = window.ghPat.getRepositoryAccess();
+  if (repoAccess) {
+    params.set('repo_access', repoAccess);
+  }
+  
+  // Get selected repositories
+  if (repoAccess === 'selected') {
+    const repos = window.ghPat.getSelectedRepositories();
+    if (repos && repos.length > 0) {
+      params.set('repos', repos.join(','));
+    }
+  }
+  
+  // Get permissions
+  const permissions = window.ghPat.getCurrentPermissions();
+  if (permissions && Object.keys(permissions).length > 0) {
+    const permsArray = Object.entries(permissions).map(([resource, level]) => `${resource}:${level}`);
+    params.set('permissions', permsArray.join(','));
+  }
+  
+  const configUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+  console.log('Configuration URL:', configUrl);
+  return configUrl;
+}
+
 // Log initialization message
 console.log('GitHub PAT Helper loaded! Available functions:');
 console.log('- ghPat.setTokenName(name)');
@@ -657,3 +835,10 @@ console.log('- ghPat.setCustomExpirationDate("YYYY-MM-DD") // After selecting cu
 console.log('- ghPat.setResourceOwner("owner-name") // Set resource owner');
 console.log('- ghPat.getResourceOwner()');
 console.log('- ghPat.getAvailableResourceOwners()');
+console.log('- ghPat.applyFromUrlParams() // Apply configuration from URL parameters');
+console.log('- ghPat.generateConfigUrl() // Generate URL with current configuration');
+
+// Auto-apply URL parameters if present
+if (window.location.search) {
+  console.log('URL parameters detected. Run ghPat.applyFromUrlParams() to apply configuration.');
+}

@@ -132,6 +132,43 @@ ghPat.getExpiration();
 - `'read'` - Read-only access
 - `'write'` - Read and write access
 
+### URL Parameters
+
+The tool can automatically apply configuration from URL parameters:
+
+```javascript
+// Apply configuration from URL parameters
+ghPat.applyFromUrlParams();
+
+// Generate URL with current configuration
+ghPat.generateConfigUrl();
+// Returns: https://github.com/settings/personal-access-tokens/new?name=CI+Token&expiration=30&...
+```
+
+#### Supported URL Parameters
+
+- `name` - Token name
+- `description` - Token description
+- `owner` - Resource owner (username or organization)
+- `expiration` - Expiration days (7, 30, 60, 90, "custom", or "none")
+- `expiration_date` - Custom expiration date (YYYY-MM-DD) when expiration=custom
+- `repo_access` - Repository access type ("none", "all", or "selected")
+- `repos` - Comma-separated list of repositories (when repo_access=selected)
+- `permissions` - Comma-separated permission pairs (format: `resource:level`)
+
+#### Example URLs
+
+```
+# Basic CI/CD token
+https://github.com/settings/personal-access-tokens/new?name=CI+Token&expiration=30&repo_access=all&permissions=contents:read,metadata:read
+
+# Organization token with specific repos
+https://github.com/settings/personal-access-tokens/new?owner=my-org&name=Deploy+Token&repo_access=selected&repos=api,frontend&permissions=contents:write,packages:write
+
+# Custom expiration date
+https://github.com/settings/personal-access-tokens/new?name=Long+Term+Token&expiration=custom&expiration_date=2025-12-31
+```
+
 ## Preset Configurations
 
 The tool includes several preset configurations:
@@ -190,6 +227,6 @@ npm run clean
 ## Future Plans
 
 - [x] Create bookmarklet version for easy installation
-- [ ] Add URL parameter parsing for configuration sharing
+- [x] Add URL parameter parsing for configuration sharing
 - [x] Create static HTML page for bookmarklet generation
 - [x] Add preset configurations for common use cases
