@@ -144,6 +144,12 @@ ghPat.applyFromUrlParams();
 // Generate URL with current configuration
 ghPat.generateConfigUrl();
 // Returns: https://github.com/settings/personal-access-tokens/new?name=CI+Token&expiration=30&...
+
+// Copy configuration URL to clipboard
+ghPat.copyConfigUrl();
+
+// Open configuration URL in new tab
+ghPat.openConfigUrl();
 ```
 
 When you visit a GitHub PAT creation page with URL parameters and run the bookmarklet, it will automatically apply the configuration.

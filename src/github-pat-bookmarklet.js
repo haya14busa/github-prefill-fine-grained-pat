@@ -960,6 +960,70 @@ window.ghPat.generateConfigUrl = function() {
   return configUrl;
 }
 
+// Copy configuration URL to clipboard
+window.ghPat.copyConfigUrl = function() {
+  const url = window.ghPat.generateConfigUrl();
+  
+  // Try using the modern clipboard API first
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        console.log('Configuration URL copied to clipboard!');
+        alert('Configuration URL copied to clipboard!');
+      })
+      .catch(err => {
+        console.error('Failed to copy URL:', err);
+        fallbackCopyToClipboard(url);
+      });
+  } else {
+    fallbackCopyToClipboard(url);
+  }
+  
+  function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+    textArea.style.padding = '0';
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+    
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        console.log('Configuration URL copied to clipboard!');
+        alert('Configuration URL copied to clipboard!');
+      } else {
+        console.error('Failed to copy URL');
+        prompt('Copy this URL:', text);
+      }
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+      prompt('Copy this URL:', text);
+    }
+    
+    document.body.removeChild(textArea);
+  }
+  
+  return url;
+}
+
+// Open configuration URL in new tab
+window.ghPat.openConfigUrl = function() {
+  const url = window.ghPat.generateConfigUrl();
+  window.open(url, '_blank');
+  return url;
+}
+
 // Log initialization message
 console.log('GitHub PAT Helper loaded! Available functions:');
 console.log('- ghPat.setTokenName(name)');
@@ -984,6 +1048,8 @@ console.log('- ghPat.getResourceOwner()');
 console.log('- ghPat.getAvailableResourceOwners()');
 console.log('- ghPat.applyFromUrlParams() // Apply configuration from URL parameters');
 console.log('- ghPat.generateConfigUrl() // Generate URL with current configuration');
+console.log('- ghPat.copyConfigUrl() // Copy configuration URL to clipboard');
+console.log('- ghPat.openConfigUrl() // Open configuration URL in new tab');
 
 // Auto-apply URL parameters if present
 if (window.location.search) {
