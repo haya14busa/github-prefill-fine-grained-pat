@@ -140,9 +140,9 @@ javascript:(function(){
       let attempts = 0;
       const checkInterval = setInterval(() => {
         attempts++;
-        const repoSearchInput = document.querySelector('.js-integrations-install-repo-selection input[type="text"]');
-        const repoList = document.querySelector('.js-integrations-install-repo-selection .js-repository-picker-results');
-        if (repoSearchInput || repoList || attempts >= maxAttempts) {
+        const pickerDialog = document.querySelector('#repository-menu-list-dialog');
+        const searchInput = document.querySelector('#repository-menu-list-filter');
+        if ((pickerDialog && searchInput) || attempts >= maxAttempts) {
           clearInterval(checkInterval);
           if (attempts >= maxAttempts) {
             console.error('Repository picker did not load in time');
@@ -175,52 +175,48 @@ javascript:(function(){
               this.addRepository(repoName);
             }, delay + (index * 300));
           });
-        });
-      }, 500);
-    },
-    
-    addRepository: function(repoName) {
-      const selectButton = document.querySelector('#repository-menu-list-button');
-      if (!selectButton) {
-        console.error('Repository select button not found');
-        return;
-      }
-      selectButton.click();
-      setTimeout(() => {
-        const searchInput = document.querySelector('#repository-menu-list-filter');
-        if (!searchInput) {
-          console.error('Repository search input not found');
-          return;
-        }
-        searchInput.value = '';
-        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-        searchInput.value = repoName;
-        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-        setTimeout(() => {
-          const repoButtons = document.querySelectorAll('button[role="option"]');
-          let found = false;
-          for (const button of repoButtons) {
-            const repoText = button.textContent.trim();
-            if (repoText.includes(repoName)) {
-              button.click();
-              console.log(`Selected repository: ${repoName}`);
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            console.error(`Repository not found: ${repoName}`);
-          }
           setTimeout(() => {
             const closeButton = document.querySelector('[data-close-dialog-id="repository-menu-list-dialog"]');
             if (closeButton) {
               closeButton.click();
             } else {
-              document.body.click();
+              const dialog = document.querySelector('#repository-menu-list-dialog');
+              if (dialog) {
+                document.body.click();
+              }
             }
-          }, 100);
-        }, 500);
-      }, 200);
+            console.log('Repository selection completed');
+          }, delay + (repoNames.length * 300) + 500);
+        });
+      }, 500);
+    },
+    
+    addRepository: function(repoName) {
+      const searchInput = document.querySelector('#repository-menu-list-filter');
+      if (!searchInput) {
+        console.error('Repository search input not found. Make sure the picker is open.');
+        return;
+      }
+      searchInput.value = '';
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+      searchInput.value = repoName;
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+      setTimeout(() => {
+        const repoButtons = document.querySelectorAll('button[role="option"]');
+        let found = false;
+        for (const button of repoButtons) {
+          const repoText = button.textContent.trim();
+          if (repoText.includes(repoName)) {
+            button.click();
+            console.log(`Selected repository: ${repoName}`);
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          console.error(`Repository not found: ${repoName}`);
+        }
+      }, 500);
     },
     
     clearAllRepositories: function() {

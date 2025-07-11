@@ -183,11 +183,11 @@ function waitForRepositoryPicker(callback, maxAttempts = 20) {
   const checkInterval = setInterval(() => {
     attempts++;
     
-    // Look for the repository search input or list
-    const repoSearchInput = document.querySelector('.js-integrations-install-repo-selection input[type="text"]');
-    const repoList = document.querySelector('.js-integrations-install-repo-selection .js-repository-picker-results');
+    // Look for the repository picker dialog
+    const pickerDialog = document.querySelector('#repository-menu-list-dialog');
+    const searchInput = document.querySelector('#repository-menu-list-filter');
     
-    if (repoSearchInput || repoList || attempts >= maxAttempts) {
+    if ((pickerDialog && searchInput) || attempts >= maxAttempts) {
       clearInterval(checkInterval);
       if (attempts >= maxAttempts) {
         console.error('Repository picker did not load in time');
@@ -241,71 +241,62 @@ function selectRepositories(repoNames) {
           addRepository(repoName);
         }, delay + (index * 300));
       });
-    });
-  }, 500); // Wait a bit after setting repository access to 'selected'
-}
-
-// Add a single repository to the selection
-function addRepository(repoName) {
-  // Click the "Select repositories" button to open the dropdown
-  const selectButton = document.querySelector('#repository-menu-list-button');
-  if (!selectButton) {
-    console.error('Repository select button not found');
-    return;
-  }
-  
-  selectButton.click();
-  
-  // Wait for dropdown to open and search
-  setTimeout(() => {
-    // Find the search input
-    const searchInput = document.querySelector('#repository-menu-list-filter');
-    if (!searchInput) {
-      console.error('Repository search input not found');
-      return;
-    }
-    
-    // Clear and type the repository name
-    searchInput.value = '';
-    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-    
-    // Type the repository name
-    searchInput.value = repoName;
-    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-    
-    // Wait for search results and click the matching repository
-    setTimeout(() => {
-      // Find the repository in the list
-      const repoButtons = document.querySelectorAll('button[role="option"]');
-      let found = false;
       
-      for (const button of repoButtons) {
-        const repoText = button.textContent.trim();
-        if (repoText.includes(repoName)) {
-          button.click();
-          console.log(`Selected repository: ${repoName}`);
-          found = true;
-          break;
-        }
-      }
-      
-      if (!found) {
-        console.error(`Repository not found: ${repoName}`);
-      }
-      
-      // Close the dropdown
+      // Close the dialog after all repositories are added
       setTimeout(() => {
         const closeButton = document.querySelector('[data-close-dialog-id="repository-menu-list-dialog"]');
         if (closeButton) {
           closeButton.click();
         } else {
           // Alternative: click outside or press Escape
-          document.body.click();
+          const dialog = document.querySelector('#repository-menu-list-dialog');
+          if (dialog) {
+            document.body.click();
+          }
         }
-      }, 100);
-      
-    }, 500); // Wait for search results
-  }, 200); // Wait for dropdown to open
+        console.log('Repository selection completed');
+      }, delay + (repoNames.length * 300) + 500);
+    });
+  }, 500); // Wait a bit after setting repository access to 'selected'
+}
+
+// Add a single repository to the selection
+function addRepository(repoName) {
+  // Find the search input (assumes picker is already open)
+  const searchInput = document.querySelector('#repository-menu-list-filter');
+  if (!searchInput) {
+    console.error('Repository search input not found. Make sure the picker is open.');
+    return;
+  }
+  
+  // Clear and type the repository name
+  searchInput.value = '';
+  searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+  
+  // Type the repository name
+  searchInput.value = repoName;
+  searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+  
+  // Wait for search results and click the matching repository
+  setTimeout(() => {
+    // Find the repository in the list
+    const repoButtons = document.querySelectorAll('button[role="option"]');
+    let found = false;
+    
+    for (const button of repoButtons) {
+      const repoText = button.textContent.trim();
+      if (repoText.includes(repoName)) {
+        button.click();
+        console.log(`Selected repository: ${repoName}`);
+        found = true;
+        break;
+      }
+    }
+    
+    if (!found) {
+      console.error(`Repository not found: ${repoName}`);
+    }
+  }, 500); // Wait for search results
 }
 
 // Clear all selected repositories
