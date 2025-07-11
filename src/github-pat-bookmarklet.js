@@ -346,8 +346,9 @@ window.ghPat.getSelectedRepositories = function() {
 }
 
 // Set token expiration
-window.ghPat.setExpiration = function(days) {
+window.ghPat.setExpiration = function(days, customDate) {
   // days can be: 7, 30, 60, 90, 'custom', or 'none'
+  // customDate: optional, used when days='custom', format: 'YYYY-MM-DD'
   
   // First, click the expiration dropdown button
   const dropdownButton = document.querySelector('.js-new-default-token-expiration-select button[popovertarget]');
@@ -380,7 +381,19 @@ window.ghPat.setExpiration = function(days) {
       console.log(`Set expiration to: ${days === 'none' ? 'No expiration' : days === 'custom' ? 'Custom' : `${days} days`}`);
       
       if (days === 'custom') {
-        console.log('Note: You will need to manually set the custom date');
+        // Wait for the date input to appear
+        setTimeout(() => {
+          const dateInput = document.getElementById('user_programmatic_access_custom_expires_at');
+          if (dateInput && customDate) {
+            dateInput.value = customDate;
+            dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+            console.log(`Set custom expiration date to: ${customDate}`);
+          } else if (!customDate) {
+            console.log('Note: Use setExpiration("custom", "YYYY-MM-DD") to set a specific date');
+          } else {
+            console.error('Custom date input not found');
+          }
+        }, 300);
       }
     } else {
       console.error(`Expiration option not found: ${days}`);
@@ -402,22 +415,44 @@ window.ghPat.getExpiration = function() {
   
   if (buttonText.includes('No expiration')) {
     console.log('Current expiration: No expiration');
-    return 'none';
+    return { type: 'none' };
   } else if (buttonText.includes('Custom')) {
-    console.log('Current expiration: Custom');
-    return 'custom';
+    // Check if there's a custom date set
+    const dateInput = document.getElementById('user_programmatic_access_custom_expires_at');
+    if (dateInput && dateInput.value) {
+      console.log(`Current expiration: Custom (${dateInput.value})`);
+      return { type: 'custom', date: dateInput.value };
+    } else {
+      console.log('Current expiration: Custom (no date set)');
+      return { type: 'custom', date: null };
+    }
   } else {
     // Extract days from text like "30 days (Aug 10, 2025)"
     const match = buttonText.match(/(\d+)\s+days/);
     if (match) {
       const days = parseInt(match[1]);
       console.log(`Current expiration: ${days} days`);
-      return days;
+      return { type: 'days', days: days };
     }
   }
   
   console.log('Could not determine current expiration');
   return null;
+}
+
+// Helper function to set custom expiration date
+window.ghPat.setCustomExpirationDate = function(date) {
+  // date format: 'YYYY-MM-DD'
+  const dateInput = document.getElementById('user_programmatic_access_custom_expires_at');
+  if (!dateInput) {
+    console.error('Custom date input not found. Make sure "custom" expiration is selected first.');
+    return false;
+  }
+  
+  dateInput.value = date;
+  dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+  console.log(`Set custom expiration date to: ${date}`);
+  return true;
 }
 
 // Example: Set repository access
@@ -440,4 +475,6 @@ console.log('- ghPat.selectRepositories([repo1, repo2, ...])');
 console.log('- ghPat.clearAllRepositories()');
 console.log('- ghPat.getSelectedRepositories()');
 console.log('- ghPat.setExpiration(days) // 7, 30, 60, 90, "custom", or "none"');
+console.log('- ghPat.setExpiration("custom", "2025-12-31") // Set custom date');
 console.log('- ghPat.getExpiration()');
+console.log('- ghPat.setCustomExpirationDate("YYYY-MM-DD") // After selecting custom');

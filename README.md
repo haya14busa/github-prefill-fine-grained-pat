@@ -82,11 +82,16 @@ ghPat.setExpiration(7);        // 7 days
 ghPat.setExpiration(30);       // 30 days (default)
 ghPat.setExpiration(60);       // 60 days
 ghPat.setExpiration(90);       // 90 days
-ghPat.setExpiration('custom'); // Custom date (manual selection required)
 ghPat.setExpiration('none');   // No expiration
 
+// Set custom expiration date
+ghPat.setExpiration('custom', '2025-12-31'); // Custom date
+ghPat.setExpiration('custom'); // Select custom, then set date manually
+ghPat.setCustomExpirationDate('2025-12-31'); // Set date after selecting custom
+
 // Get current expiration setting
-ghPat.getExpiration(); // Returns: 7, 30, 60, 90, 'custom', 'none', or null
+ghPat.getExpiration(); 
+// Returns: {type: 'days', days: 30} or {type: 'custom', date: '2025-12-31'} or {type: 'none'}
 ```
 
 ### Permission Values

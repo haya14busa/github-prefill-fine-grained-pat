@@ -164,6 +164,23 @@ ghPat.setMultiplePermissions({
     </div>
 
     <div class="preset">
+        <h3>Long-term Service Token</h3>
+        <p>For services that need extended access (use with caution).</p>
+        <pre><code>// Set custom expiration 6 months from now
+const sixMonths = new Date();
+sixMonths.setMonth(sixMonths.getMonth() + 6);
+const dateStr = sixMonths.toISOString().split('T')[0];
+
+ghPat.setExpiration('custom', dateStr);
+ghPat.setRepositoryAccess('selected');
+ghPat.setMultiplePermissions({
+  'contents': 'read',
+  'metadata': 'read'
+});</code></pre>
+        <button onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy Code</button>
+    </div>
+
+    <div class="preset">
         <h3>Admin Token</h3>
         <p>Full access for repository administration (use sparingly and rotate frequently).</p>
         <pre><code>ghPat.setExpiration(7); // Short expiration for admin tokens!
@@ -195,7 +212,7 @@ ghPat.setMultiplePermissions({
 
         <div class="permission-group">
             <label>Token Expiration:
-                <select id="token-expiration" onchange="updateGeneratedCode()">
+                <select id="token-expiration" onchange="updateGeneratedCode(); toggleCustomDate()">
                     <option value="7">7 days</option>
                     <option value="30" selected>30 days</option>
                     <option value="60">60 days</option>
@@ -203,6 +220,10 @@ ghPat.setMultiplePermissions({
                     <option value="custom">Custom</option>
                     <option value="none">No expiration</option>
                 </select>
+            </label>
+            <label id="custom-date-group" style="display: none; margin-left: 10px;">
+                Custom Date:
+                <input type="date" id="custom-date" onchange="updateGeneratedCode()" style="padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 4px;">
             </label>
         </div>
 
@@ -290,6 +311,8 @@ ghPat.setMultiplePermissions({
         <li><code>ghPat.clearAllRepositories()</code> - Clear all selected repositories</li>
         <li><code>ghPat.getSelectedRepositories()</code> - Get list of currently selected repositories</li>
         <li><code>ghPat.setExpiration(days)</code> - Set token expiration (7, 30, 60, 90, 'custom', or 'none')</li>
+        <li><code>ghPat.setExpiration('custom', 'YYYY-MM-DD')</code> - Set custom expiration date</li>
+        <li><code>ghPat.setCustomExpirationDate('YYYY-MM-DD')</code> - Set date after selecting custom</li>
         <li><code>ghPat.getExpiration()</code> - Get current expiration setting</li>
     </ul>
 
@@ -318,8 +341,15 @@ ghPat.setMultiplePermissions({
             let code = '';
             
             // Add expiration setting
-            if (expiration === 'none' || expiration === 'custom') {
+            if (expiration === 'none') {
                 code += `ghPat.setExpiration('${expiration}');\n`;
+            } else if (expiration === 'custom') {
+                const customDate = document.getElementById('custom-date').value;
+                if (customDate) {
+                    code += `ghPat.setExpiration('custom', '${customDate}');\n`;
+                } else {
+                    code += `ghPat.setExpiration('custom'); // Set date manually\n`;
+                }
             } else {
                 code += `ghPat.setExpiration(${expiration});\n`;
             }
@@ -336,6 +366,19 @@ ghPat.setMultiplePermissions({
             }
 
             document.getElementById('generated-code').textContent = code;
+        }
+
+        function toggleCustomDate() {
+            const expiration = document.getElementById('token-expiration').value;
+            const customDateGroup = document.getElementById('custom-date-group');
+            customDateGroup.style.display = expiration === 'custom' ? 'inline' : 'none';
+            
+            // Set default custom date to 30 days from now
+            if (expiration === 'custom' && !document.getElementById('custom-date').value) {
+                const futureDate = new Date();
+                futureDate.setDate(futureDate.getDate() + 30);
+                document.getElementById('custom-date').value = futureDate.toISOString().split('T')[0];
+            }
         }
 
         // Initialize the code on page load
