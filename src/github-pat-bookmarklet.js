@@ -800,32 +800,13 @@ window.ghPat.applyFromUrlParams = async function() {
   try {
     const promises = [];
     
-    // These can run in parallel (no dependencies on resource owner)
+    // Only name and description are independent of resource owner
     if (config.name) {
       promises.push(Promise.resolve(window.ghPat.setTokenName(config.name)));
     }
     
     if (config.description) {
       promises.push(Promise.resolve(window.ghPat.setTokenDescription(config.description)));
-    }
-    
-    if (config.expiration) {
-      promises.push(new Promise(resolve => {
-        if (config.expiration === 'custom' && config.expirationDate) {
-          window.ghPat.setExpiration('custom', config.expirationDate);
-        } else if (config.expiration === 'none') {
-          window.ghPat.setExpiration('none');
-        } else {
-          // Convert string to number for numeric expiration days
-          const expirationDays = parseInt(config.expiration, 10);
-          if (!isNaN(expirationDays)) {
-            window.ghPat.setExpiration(expirationDays);
-          } else {
-            console.error(`Invalid expiration value: ${config.expiration}`);
-          }
-        }
-        setTimeout(resolve, 500);
-      }));
     }
     
     // Wait for independent operations to complete
@@ -855,6 +836,24 @@ window.ghPat.applyFromUrlParams = async function() {
           // Continue anyway - elements might still be accessible
         }
       }
+    }
+    
+    // Set expiration after owner change (it gets reset)
+    if (config.expiration) {
+      if (config.expiration === 'custom' && config.expirationDate) {
+        window.ghPat.setExpiration('custom', config.expirationDate);
+      } else if (config.expiration === 'none') {
+        window.ghPat.setExpiration('none');
+      } else {
+        // Convert string to number for numeric expiration days
+        const expirationDays = parseInt(config.expiration, 10);
+        if (!isNaN(expirationDays)) {
+          window.ghPat.setExpiration(expirationDays);
+        } else {
+          console.error(`Invalid expiration value: ${config.expiration}`);
+        }
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
     
     // Repository access must be set before selecting repositories
