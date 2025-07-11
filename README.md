@@ -134,16 +134,18 @@ ghPat.getExpiration();
 
 ### URL Parameters
 
-The tool can automatically apply configuration from URL parameters:
+The tool automatically applies configuration from URL parameters when the bookmarklet is executed. You can also manually control this:
 
 ```javascript
-// Apply configuration from URL parameters
+// Manually apply configuration from URL parameters
 ghPat.applyFromUrlParams();
 
 // Generate URL with current configuration
 ghPat.generateConfigUrl();
 // Returns: https://github.com/settings/personal-access-tokens/new?name=CI+Token&expiration=30&...
 ```
+
+When you visit a GitHub PAT creation page with URL parameters and run the bookmarklet, it will automatically apply the configuration.
 
 #### Supported URL Parameters
 

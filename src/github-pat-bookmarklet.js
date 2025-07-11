@@ -852,5 +852,6 @@ console.log('- ghPat.generateConfigUrl() // Generate URL with current configurat
 
 // Auto-apply URL parameters if present
 if (window.location.search) {
-  console.log('URL parameters detected. Run ghPat.applyFromUrlParams() to apply configuration.');
+  console.log('URL parameters detected. Applying configuration...');
+  window.ghPat.applyFromUrlParams();
 }
