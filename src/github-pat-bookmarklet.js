@@ -386,6 +386,42 @@ window.ghPat.selectRepositories = async function(repoNames) {
   }
 }
 
+// Wait for repository to appear in selected list
+window.ghPat.waitForRepositoryInList = function(repoName, maxRetries = 10) {
+  return new Promise((resolve, reject) => {
+    let retries = 0;
+    
+    const checkRepository = () => {
+      const selectedRepos = document.querySelectorAll('.js-repository-picker-result .repo-and-owner');
+      let found = false;
+      
+      for (const element of selectedRepos) {
+        const fullName = element.textContent.trim();
+        // Check if the repository name matches (handle both owner/repo and just repo)
+        if (fullName.includes(repoName)) {
+          found = true;
+          break;
+        }
+      }
+      
+      if (found) {
+        console.log(`Repository ${repoName} confirmed in selection list`);
+        resolve();
+      } else {
+        retries++;
+        if (retries >= maxRetries) {
+          reject(new Error(`Repository ${repoName} not found in selection list after ${maxRetries} attempts`));
+        } else {
+          setTimeout(checkRepository, 200);
+        }
+      }
+    };
+    
+    // Start checking after a small delay
+    setTimeout(checkRepository, 200);
+  });
+}
+
 // Add a single repository to the selection
 window.ghPat.addRepository = async function(repoName, maxRetries = 5) {
   // Find the search input (assumes picker is already open)
@@ -415,20 +451,26 @@ window.ghPat.addRepository = async function(repoName, maxRetries = 5) {
       const repoText = button.textContent.trim();
       if (repoText.includes(repoName)) {
         button.click();
-        console.log(`Selected repository: ${repoName}`);
+        console.log(`Clicked repository: ${repoName}`);
         found = true;
+        
+        // Wait for the repository to appear in the selected list
+        try {
+          await window.ghPat.waitForRepositoryInList(repoName);
+          return; // Success!
+        } catch (error) {
+          console.error(`Repository ${repoName} was clicked but didn't appear in list:`, error);
+          // Continue to retry
+          found = false;
+        }
         break;
       }
     }
     
-    if (found) {
-      return; // Success!
-    }
-    
-    if (retryCount < maxRetries - 1) {
+    if (retryCount < maxRetries - 1 && !found) {
       console.log(`Repository ${repoName} not found yet, retrying... (${retryCount + 1}/${maxRetries})`);
       await new Promise(resolve => setTimeout(resolve, 300));
-    } else {
+    } else if (retryCount === maxRetries - 1 && !found) {
       throw new Error(`Repository not found after ${maxRetries} attempts: ${repoName}`);
     }
   }
