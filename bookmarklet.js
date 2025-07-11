@@ -160,7 +160,7 @@ javascript:(function(){
         this.setRepositoryAccess('selected');
       }
       setTimeout(() => {
-        const selectButton = document.querySelector('#repository-menu-list');
+        const selectButton = document.querySelector('#repository-menu-list-button');
         if (!selectButton) {
           console.error('Repository picker button not found');
           return;
@@ -180,7 +180,7 @@ javascript:(function(){
     },
     
     addRepository: function(repoName) {
-      const selectButton = document.querySelector('#repository-menu-list');
+      const selectButton = document.querySelector('#repository-menu-list-button');
       if (!selectButton) {
         console.error('Repository select button not found');
         return;

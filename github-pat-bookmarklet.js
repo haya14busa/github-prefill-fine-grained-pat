@@ -220,7 +220,7 @@ function selectRepositories(repoNames) {
   
   // Open the repository picker by clicking the button
   setTimeout(() => {
-    const selectButton = document.querySelector('#repository-menu-list');
+    const selectButton = document.querySelector('#repository-menu-list-button');
     if (!selectButton) {
       console.error('Repository picker button not found');
       return;
@@ -248,7 +248,7 @@ function selectRepositories(repoNames) {
 // Add a single repository to the selection
 function addRepository(repoName) {
   // Click the "Select repositories" button to open the dropdown
-  const selectButton = document.querySelector('#repository-menu-list');
+  const selectButton = document.querySelector('#repository-menu-list-button');
   if (!selectButton) {
     console.error('Repository select button not found');
     return;
