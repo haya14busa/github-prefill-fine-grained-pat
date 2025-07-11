@@ -178,25 +178,27 @@ function getRepositoryAccess() {
 }
 
 // Helper function to wait for repository picker to load
-function waitForRepositoryPicker(callback, maxAttempts = 20) {
-  let attempts = 0;
-  const checkInterval = setInterval(() => {
-    attempts++;
-    
-    // Look for the repository picker dialog
-    const pickerDialog = document.querySelector('#repository-menu-list-dialog');
-    const searchInput = document.querySelector('#repository-menu-list-filter');
-    
-    if ((pickerDialog && searchInput) || attempts >= maxAttempts) {
-      clearInterval(checkInterval);
-      if (attempts >= maxAttempts) {
-        console.error('Repository picker did not load in time');
-      } else {
-        console.log('Repository picker loaded');
-        if (callback) callback();
+function waitForRepositoryPicker(maxAttempts = 20) {
+  return new Promise((resolve, reject) => {
+    let attempts = 0;
+    const checkInterval = setInterval(() => {
+      attempts++;
+      
+      // Look for the repository picker dialog
+      const pickerDialog = document.querySelector('#repository-menu-list-dialog');
+      const searchInput = document.querySelector('#repository-menu-list-filter');
+      
+      if ((pickerDialog && searchInput) || attempts >= maxAttempts) {
+        clearInterval(checkInterval);
+        if (attempts >= maxAttempts) {
+          reject(new Error('Repository picker did not load in time'));
+        } else {
+          console.log('Repository picker loaded');
+          resolve();
+        }
       }
-    }
-  }, 500);
+    }, 500);
+  });
 }
 
 // Test: Set blocking permission to read-write
@@ -211,62 +213,68 @@ function waitForRepositoryPicker(callback, maxAttempts = 20) {
 // });
 
 // Select specific repositories (when repository access is set to 'selected')
-function selectRepositories(repoNames) {
-  // First ensure 'selected' mode is active
-  if (getRepositoryAccess() !== 'selected') {
-    console.log('Setting repository access to "selected" first...');
-    setRepositoryAccess('selected');
-  }
-  
-  // Open the repository picker by clicking the button
-  setTimeout(() => {
+async function selectRepositories(repoNames) {
+  try {
+    // First ensure 'selected' mode is active
+    if (getRepositoryAccess() !== 'selected') {
+      console.log('Setting repository access to "selected" first...');
+      setRepositoryAccess('selected');
+      // Wait for UI to update
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // Open the repository picker by clicking the button
     const selectButton = document.querySelector('#repository-menu-list-button');
     if (!selectButton) {
-      console.error('Repository picker button not found');
-      return;
+      throw new Error('Repository picker button not found');
     }
     
     selectButton.click();
     console.log('Opening repository picker...');
     
     // Wait for repository picker to load
-    waitForRepositoryPicker(() => {
-      // Clear any existing selections first
-      clearAllRepositories();
-      
-      // Add each repository
-      let delay = 500; // Initial delay to ensure UI is ready
-      repoNames.forEach((repoName, index) => {
-        setTimeout(() => {
-          addRepository(repoName);
-        }, delay + (index * 300));
-      });
-      
-      // Close the dialog after all repositories are added
-      setTimeout(() => {
-        const closeButton = document.querySelector('[data-close-dialog-id="repository-menu-list-dialog"]');
-        if (closeButton) {
-          closeButton.click();
-        } else {
-          // Alternative: click outside or press Escape
-          const dialog = document.querySelector('#repository-menu-list-dialog');
-          if (dialog) {
-            document.body.click();
-          }
-        }
-        console.log('Repository selection completed');
-      }, delay + (repoNames.length * 300) + 500);
-    });
-  }, 500); // Wait a bit after setting repository access to 'selected'
+    await waitForRepositoryPicker();
+    
+    // Clear any existing selections first
+    clearAllRepositories();
+    
+    // Wait a bit for UI to update
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Add each repository sequentially
+    for (const repoName of repoNames) {
+      try {
+        await addRepository(repoName);
+        // Small delay between selections
+        await new Promise(resolve => setTimeout(resolve, 300));
+      } catch (error) {
+        console.error(`Failed to add repository ${repoName}:`, error.message);
+      }
+    }
+    
+    // Close the dialog after all repositories are added
+    const closeButton = document.querySelector('[data-close-dialog-id="repository-menu-list-dialog"]');
+    if (closeButton) {
+      closeButton.click();
+    } else {
+      // Alternative: click outside or press Escape
+      const dialog = document.querySelector('#repository-menu-list-dialog');
+      if (dialog) {
+        document.body.click();
+      }
+    }
+    console.log('Repository selection completed');
+  } catch (error) {
+    console.error('Error in selectRepositories:', error.message);
+  }
 }
 
 // Add a single repository to the selection
-function addRepository(repoName, maxRetries = 5) {
+async function addRepository(repoName, maxRetries = 5) {
   // Find the search input (assumes picker is already open)
   const searchInput = document.querySelector('#repository-menu-list-filter');
   if (!searchInput) {
-    console.error('Repository search input not found. Make sure the picker is open.');
-    return;
+    throw new Error('Repository search input not found. Make sure the picker is open.');
   }
   
   // Clear and type the repository name
@@ -277,9 +285,11 @@ function addRepository(repoName, maxRetries = 5) {
   searchInput.value = repoName;
   searchInput.dispatchEvent(new Event('input', { bubbles: true }));
   
+  // Wait a bit for initial search
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
   // Retry logic for finding and clicking the repository
-  let retryCount = 0;
-  const trySelectRepo = () => {
+  for (let retryCount = 0; retryCount < maxRetries; retryCount++) {
     // Find the repository in the list
     const repoButtons = document.querySelectorAll('button[role="option"]');
     let found = false;
@@ -294,19 +304,17 @@ function addRepository(repoName, maxRetries = 5) {
       }
     }
     
-    if (!found) {
-      retryCount++;
-      if (retryCount < maxRetries) {
-        console.log(`Repository ${repoName} not found yet, retrying... (${retryCount}/${maxRetries})`);
-        setTimeout(trySelectRepo, 300); // Retry after 300ms
-      } else {
-        console.error(`Repository not found after ${maxRetries} attempts: ${repoName}`);
-      }
+    if (found) {
+      return; // Success!
     }
-  };
-  
-  // Start trying after initial delay
-  setTimeout(trySelectRepo, 500);
+    
+    if (retryCount < maxRetries - 1) {
+      console.log(`Repository ${repoName} not found yet, retrying... (${retryCount + 1}/${maxRetries})`);
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } else {
+      throw new Error(`Repository not found after ${maxRetries} attempts: ${repoName}`);
+    }
+  }
 }
 
 // Clear all selected repositories
