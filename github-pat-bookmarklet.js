@@ -210,7 +210,121 @@ function waitForRepositoryPicker(callback, maxAttempts = 20) {
 //   'pull_requests': 'write'
 // });
 
+// Select specific repositories (when repository access is set to 'selected')
+function selectRepositories(repoNames) {
+  // First ensure 'selected' mode is active
+  if (getRepositoryAccess() !== 'selected') {
+    console.log('Setting repository access to "selected" first...');
+    setRepositoryAccess('selected');
+  }
+  
+  // Wait for repository picker to load
+  waitForRepositoryPicker(() => {
+    // Clear any existing selections first
+    clearAllRepositories();
+    
+    // Add each repository
+    let delay = 500; // Initial delay to ensure UI is ready
+    repoNames.forEach((repoName, index) => {
+      setTimeout(() => {
+        addRepository(repoName);
+      }, delay + (index * 300));
+    });
+  });
+}
+
+// Add a single repository to the selection
+function addRepository(repoName) {
+  // Click the "Select repositories" button to open the dropdown
+  const selectButton = document.querySelector('#repository-menu-list-button');
+  if (!selectButton) {
+    console.error('Repository select button not found');
+    return;
+  }
+  
+  selectButton.click();
+  
+  // Wait for dropdown to open and search
+  setTimeout(() => {
+    // Find the search input
+    const searchInput = document.querySelector('#repository-menu-list-filter');
+    if (!searchInput) {
+      console.error('Repository search input not found');
+      return;
+    }
+    
+    // Clear and type the repository name
+    searchInput.value = '';
+    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    
+    // Type the repository name
+    searchInput.value = repoName;
+    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    
+    // Wait for search results and click the matching repository
+    setTimeout(() => {
+      // Find the repository in the list
+      const repoButtons = document.querySelectorAll('button[role="option"]');
+      let found = false;
+      
+      for (const button of repoButtons) {
+        const repoText = button.textContent.trim();
+        if (repoText.includes(repoName)) {
+          button.click();
+          console.log(`Selected repository: ${repoName}`);
+          found = true;
+          break;
+        }
+      }
+      
+      if (!found) {
+        console.error(`Repository not found: ${repoName}`);
+      }
+      
+      // Close the dropdown
+      setTimeout(() => {
+        const closeButton = document.querySelector('[data-close-dialog-id="repository-menu-list-dialog"]');
+        if (closeButton) {
+          closeButton.click();
+        } else {
+          // Alternative: click outside or press Escape
+          document.body.click();
+        }
+      }, 100);
+      
+    }, 500); // Wait for search results
+  }, 200); // Wait for dropdown to open
+}
+
+// Clear all selected repositories
+function clearAllRepositories() {
+  const removeButtons = document.querySelectorAll('.js-repository-picker-remove');
+  removeButtons.forEach(button => {
+    button.click();
+  });
+  console.log(`Cleared ${removeButtons.length} repositories`);
+}
+
+// Get currently selected repositories
+function getSelectedRepositories() {
+  const selectedRepos = [];
+  const repoElements = document.querySelectorAll('.js-repository-picker-result .repo-and-owner');
+  
+  repoElements.forEach(element => {
+    const repoName = element.textContent.trim();
+    selectedRepos.push(repoName);
+  });
+  
+  console.log('Currently selected repositories:');
+  console.log(selectedRepos);
+  
+  return selectedRepos;
+}
+
 // Example: Set repository access
 // setRepositoryAccess('all'); // All repos
 // setRepositoryAccess('selected'); // Selected repos only
 // setRepositoryAccess('none'); // Public repos only
+
+// Example: Select specific repositories
+// selectRepositories(['myrepo', 'another-repo', 'third-repo']);

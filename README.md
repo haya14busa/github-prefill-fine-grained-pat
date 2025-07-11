@@ -10,6 +10,13 @@ Creating GitHub fine-grained PATs requires filling many form fields and selectin
 
 This tool provides JavaScript functions that can be run as a bookmarklet to automatically fill the PAT creation form based on predefined configurations.
 
+## Installation
+
+1. Visit the [GitHub PAT Helper page](./index.html) (open `index.html` in your browser)
+2. Drag the "GitHub PAT Helper" button to your bookmarks bar
+3. Navigate to [GitHub's PAT creation page](https://github.com/settings/personal-access-tokens/new)
+4. Click the bookmarklet to load the helper functions
+
 ## Usage
 
 ### Basic Functions
@@ -42,6 +49,15 @@ setRepositoryAccess('none');     // Public repositories only
 
 // Get current repository access setting
 getRepositoryAccess();
+
+// Select specific repositories (when access is set to 'selected')
+selectRepositories(['owner/repo1', 'owner/repo2']);
+
+// Clear all selected repositories
+clearAllRepositories();
+
+// Get currently selected repositories
+getSelectedRepositories();
 ```
 
 ### Permission Values
@@ -50,13 +66,27 @@ getRepositoryAccess();
 - `'read'` - Read-only access
 - `'write'` - Read and write access
 
+## Preset Configurations
+
+The tool includes several preset configurations:
+
+- **CI/CD Token**: Read-only access for continuous integration
+- **Development Token**: Read/write access for development workflows
+- **Release Automation**: Permissions for automated releases
+- **Admin Token**: Full administrative access (use sparingly)
+
+Access these presets through the HTML interface or copy the code from the examples.
+
 ## Development
 
-The main script is in `github-pat-bookmarklet.js`.
+The project consists of:
+- `github-pat-bookmarklet.js` - Core functionality
+- `bookmarklet.js` - Minified bookmarklet version
+- `index.html` - User interface with presets and configuration builder
 
 ## Future Plans
 
-- [ ] Create bookmarklet version for easy installation
+- [x] Create bookmarklet version for easy installation
 - [ ] Add URL parameter parsing for configuration sharing
-- [ ] Create static HTML page for bookmarklet generation
-- [ ] Add preset configurations for common use cases
+- [x] Create static HTML page for bookmarklet generation
+- [x] Add preset configurations for common use cases
