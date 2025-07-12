@@ -219,18 +219,18 @@ ghPat.updateUrlParams();
 
 The tool includes several preset configurations available on the [web interface](https://haya14busa.github.io/github-prefill-fine-grained-pat/):
 
-- **LLM Agent Token (1 day)**: Short-lived token for AI agents with minimal permissions to reduce risk
-- **LLM Agent Token (7 days)**: Weekly token for AI agents working on longer tasks
+- **Minimal Token**: Minimal access for testing purposes (1 day expiration)
+- **Coding Agent Token (1 day)**: Short-lived token for AI coding assistants with minimal permissions
+- **Coding Agent Token (7 days)**: Weekly token for AI coding assistants working on longer projects
+- **Development Token**: Local development with code, issues, and PR access
 - **Read All Permissions**: Comprehensive read access to all available permissions
 - **Write All Permissions**: Full write access to all permissions (use with extreme caution!)
-- **Development Token**: Local development with code, issues, and PR access
-- **Minimal Token**: Minimal access for testing purposes
 
 Each preset generates a URL that you can bookmark or share with your team.
 
-### Security Best Practices for LLM Agents
+### Security Best Practices for AI Coding Agents
 
-When creating tokens for AI agents:
+When creating tokens for AI coding assistants:
 
 - **Use minimal expiration**: 1 day for quick tasks, 7 days maximum for longer projects
 - **Limit repository access**: Use "selected repositories" instead of "all repositories"

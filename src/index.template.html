@@ -102,13 +102,61 @@
 
         <div class="grid md:grid-cols-2 gap-6 mb-8">
             <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-2">LLM Agent Token (1 day) 🤖</h3>
-                <p class="text-gray-600 mb-4">Short-lived token for AI agents with minimal permissions to reduce risk if exposed.</p>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Minimal Token</h3>
+                <p class="text-gray-600 mb-4">Minimal access for testing or verification purposes.</p>
                 <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
-                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=LLM+Agent+Token&description=Short-lived+token+for+AI+agent+tasks&expiration=1&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read</code>
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Minimal+Token&description=Minimal+access+for+testing&expiration=1&repo_access=none&permissions=metadata:read</code>
                 </div>
                 <div class="flex space-x-3">
-                    <a href="https://github.com/settings/personal-access-tokens/new?name=LLM+Agent+Token&description=Short-lived+token+for+AI+agent+tasks&expiration=1&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=Minimal+Token&description=Minimal+access+for+testing&expiration=1&repo_access=none&permissions=metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Open Configuration
+                    </a>
+                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Copy URL
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Coding Agent Token (1 day) 🤖</h3>
+                <p class="text-gray-600 mb-4">Short-lived token for AI coding assistants with minimal permissions to reduce risk if exposed.</p>
+                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Coding+Agent+Token&description=Short-lived+token+for+AI+coding+assistant&expiration=1&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read</code>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=Coding+Agent+Token&description=Short-lived+token+for+AI+coding+assistant&expiration=1&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Open Configuration
+                    </a>
+                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Copy URL
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Coding Agent Token (7 days) 🤖</h3>
+                <p class="text-gray-600 mb-4">Weekly token for AI coding assistants working on longer projects, still limited to minimize exposure risk.</p>
+                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Coding+Agent+Token+-+Weekly&description=Limited+token+for+AI+coding+assistant+projects&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,discussions:write,metadata:read</code>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=Coding+Agent+Token+-+Weekly&description=Limited+token+for+AI+coding+assistant+projects&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,discussions:write,metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Open Configuration
+                    </a>
+                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Copy URL
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Development Token</h3>
+                <p class="text-gray-600 mb-4">For local development with ability to push code and manage issues/PRs.</p>
+                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Development+Token&description=Local+development+access&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read</code>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=Development+Token&description=Local+development+access&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
                         Open Configuration
                     </a>
                     <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
@@ -141,54 +189,6 @@
                 </div>
                 <div class="flex space-x-3">
                     <a href="https://github.com/settings/personal-access-tokens/new?name=Write+All+Token&description=Full+write+access+-+use+with+caution&expiration=7&repo_access=selected&permissions=actions:write,administration:write,attestations:write,security_events:write,codespaces:write,codespaces_lifecycle_admin:write,codespaces_secrets:write,statuses:write,contents:write,repository_custom_properties:write,vulnerability_alerts:write,dependabot_secrets:write,deployments:write,discussions:write,environments:write,issues:write,merge_queues:write,metadata:read,pages:write,pull_requests:write,repository_advisories:write,secret_scanning_alerts:write,secrets:write,actions_variables:write,repository_hooks:write,workflows:write,blocking:write,codespaces_user_secrets:write,emails:write,followers:write,gpg_keys:write,gists:write,keys:write,interaction_limits:write,knowledge_bases:write,profile:write,git_signing_ssh_public_keys:write,starring:write,watching:write" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition-colors">
-                        Open Configuration
-                    </a>
-                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
-                        Copy URL
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Development Token</h3>
-                <p class="text-gray-600 mb-4">For local development with ability to push code and manage issues/PRs.</p>
-                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
-                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Development+Token&description=Local+development+access&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read</code>
-                </div>
-                <div class="flex space-x-3">
-                    <a href="https://github.com/settings/personal-access-tokens/new?name=Development+Token&description=Local+development+access&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
-                        Open Configuration
-                    </a>
-                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
-                        Copy URL
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-2">LLM Agent Token (7 days) 🤖</h3>
-                <p class="text-gray-600 mb-4">Weekly token for AI agents working on longer tasks, still limited to minimize exposure risk.</p>
-                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
-                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=LLM+Agent+Token+-+Weekly&description=Limited+token+for+AI+agent+longer+tasks&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,discussions:write,metadata:read</code>
-                </div>
-                <div class="flex space-x-3">
-                    <a href="https://github.com/settings/personal-access-tokens/new?name=LLM+Agent+Token+-+Weekly&description=Limited+token+for+AI+agent+longer+tasks&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,discussions:write,metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
-                        Open Configuration
-                    </a>
-                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
-                        Copy URL
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Minimal Token</h3>
-                <p class="text-gray-600 mb-4">Minimal access for testing or verification purposes.</p>
-                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
-                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Minimal+Token&description=Minimal+access+for+testing&expiration=1&repo_access=none&permissions=metadata:read</code>
-                </div>
-                <div class="flex space-x-3">
-                    <a href="https://github.com/settings/personal-access-tokens/new?name=Minimal+Token&description=Minimal+access+for+testing&expiration=1&repo_access=none&permissions=metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
                         Open Configuration
                     </a>
                     <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
