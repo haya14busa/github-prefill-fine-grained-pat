@@ -102,13 +102,13 @@
 
         <div class="grid md:grid-cols-2 gap-6 mb-8">
             <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-2">CI/CD Token (Read-only)</h3>
-                <p class="text-gray-600 mb-4">Suitable for continuous integration workflows that need to read code and download packages.</p>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">LLM Agent Token (1 day) 🤖</h3>
+                <p class="text-gray-600 mb-4">Short-lived token for AI agents with minimal permissions to reduce risk if exposed.</p>
                 <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
-                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=CI%2FCD+Read-only+Token&description=Automated+CI%2FCD+workflow+-+read+access+only&expiration=30&repo_access=all&permissions=contents:read,metadata:read,packages:read</code>
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=LLM+Agent+Token&description=Short-lived+token+for+AI+agent+tasks&expiration=1&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read</code>
                 </div>
                 <div class="flex space-x-3">
-                    <a href="https://github.com/settings/personal-access-tokens/new?name=CI%2FCD+Read-only+Token&description=Automated+CI%2FCD+workflow+-+read+access+only&expiration=30&repo_access=all&permissions=contents:read,metadata:read,packages:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=LLM+Agent+Token&description=Short-lived+token+for+AI+agent+tasks&expiration=1&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
                         Open Configuration
                     </a>
                     <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
@@ -166,13 +166,13 @@
             </div>
 
             <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Release Automation</h3>
-                <p class="text-gray-600 mb-4">For automated release workflows that need to create releases and upload packages.</p>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">LLM Agent Token (7 days) 🤖</h3>
+                <p class="text-gray-600 mb-4">Weekly token for AI agents working on longer tasks, still limited to minimize exposure risk.</p>
                 <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
-                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Release+Automation&description=Automated+release+workflow&expiration=90&repo_access=selected&permissions=contents:write,packages:write,metadata:read,actions:read</code>
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=LLM+Agent+Token+-+Weekly&description=Limited+token+for+AI+agent+longer+tasks&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,discussions:write,metadata:read</code>
                 </div>
                 <div class="flex space-x-3">
-                    <a href="https://github.com/settings/personal-access-tokens/new?name=Release+Automation&description=Automated+release+workflow&expiration=90&repo_access=selected&permissions=contents:write,packages:write,metadata:read,actions:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=LLM+Agent+Token+-+Weekly&description=Limited+token+for+AI+agent+longer+tasks&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,discussions:write,metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
                         Open Configuration
                     </a>
                     <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
