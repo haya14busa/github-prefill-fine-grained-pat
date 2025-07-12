@@ -19,10 +19,10 @@ const bookmarkletData = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../dist/bookmarklet.json'), 'utf8')
 );
 
-// Replace the bookmarklet URL in the HTML
+// Replace the bookmarklet URL placeholder in the HTML
 htmlContent = htmlContent.replace(
-  /href="javascript:[^"]+"/,
-  `href="${bookmarkletData.url}"`
+  /<!--BOOKMARKLET_URL-->/g,
+  bookmarkletData.url
 );
 
 // Save the built HTML
