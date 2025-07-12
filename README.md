@@ -266,12 +266,12 @@ npm run clean
 
 ## Browser Compatibility
 
-Works with all modern browsers that support:
+Requires a modern browser with support for:
 - ES6+ JavaScript
 - Async/await
 - URL and URLSearchParams APIs
 
-Tested on Chrome, Firefox, Safari, and Edge.
+Tested on Chrome.
 
 ## Contributing
 
