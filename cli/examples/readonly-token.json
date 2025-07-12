@@ -1,0 +1,14 @@
+{
+  "name": "Read-Only Access Token",
+  "description": "Token for read-only access to repositories",
+  "owner": "myuser",
+  "expiration": "none",
+  "repoAccess": "all",
+  "permissions": {
+    "contents": "read",
+    "issues": "read",
+    "metadata": "read",
+    "pull_requests": "read",
+    "actions": "read"
+  }
+}

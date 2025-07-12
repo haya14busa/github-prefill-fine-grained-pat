@@ -1,0 +1,15 @@
+name: CI/CD Token
+description: Token for GitHub Actions workflows
+owner: myorg
+expiration: 30
+repoAccess: selected
+repos:
+  - myorg/api
+  - myorg/frontend
+  - myorg/infrastructure
+permissions:
+  contents: write
+  issues: read
+  metadata: read
+  pull_requests: write
+  actions: write
