@@ -2,6 +2,9 @@
 
 A bookmarklet tool to automate the creation of GitHub fine-grained personal access tokens.
 
+**Author:** haya14busa  
+**License:** MIT
+
 ## Problem
 
 Creating GitHub fine-grained PATs requires filling many form fields and selecting individual permissions, which is time-consuming and encourages users to set longer expiration dates instead of rotating tokens frequently.
@@ -12,7 +15,11 @@ This tool provides JavaScript functions that can be run as a bookmarklet to auto
 
 ## Installation
 
-### Option 1: Local Build
+### Option 1: GitHub Pages (Recommended)
+
+Visit the [GitHub PAT Helper page](https://haya14busa.github.io/github-prefill-fine-grained-pat/) and drag the bookmarklet button to your bookmarks bar.
+
+### Option 2: Local Build
 
 ```bash
 git clone https://github.com/haya14busa/github-prefill-fine-grained-pat.git
@@ -22,16 +29,18 @@ npm run build
 npm run serve
 ```
 
-Then visit http://localhost:8080
-
-### Option 2: Pre-built Version
-
-1. Open `dist/index.html` in your browser (after building)
-2. Drag the "GitHub PAT Helper" button to your bookmarks bar
-3. Navigate to [GitHub's PAT creation page](https://github.com/settings/personal-access-tokens/new)
-4. Click the bookmarklet to load the helper functions
+Then visit http://localhost:8080 and drag the bookmarklet button to your bookmarks bar.
 
 ## Usage
+
+### Quick Start
+
+1. Navigate to [GitHub's PAT creation page](https://github.com/settings/personal-access-tokens/new)
+2. Click the bookmarklet in your bookmarks bar
+3. The bookmarklet automatically:
+   - **If URL has parameters & form is empty:** Applies the configuration
+   - **If form has values:** Saves to URL & copies shareable link
+   - **If both are empty:** Loads helper functions for manual use
 
 ### Token Name and Description
 
@@ -191,14 +200,16 @@ https://github.com/settings/personal-access-tokens/new?name=Two+Week+Token&expir
 
 ## Preset Configurations
 
-The tool includes several preset configurations:
+The tool includes several preset configurations available on the [web interface](https://haya14busa.github.io/github-prefill-fine-grained-pat/):
 
-- **CI/CD Token**: Read-only access for continuous integration
-- **Development Token**: Read/write access for development workflows
-- **Release Automation**: Permissions for automated releases
-- **Admin Token**: Full administrative access (use sparingly)
+- **CI/CD Token (Read-only)**: Read access for continuous integration workflows
+- **Read All Permissions**: Comprehensive read access to all available permissions
+- **Write All Permissions**: Full write access to all permissions (use with extreme caution!)
+- **Development Token**: Local development with code, issues, and PR access
+- **Release Automation**: For automated release workflows with package management
+- **Minimal Token**: Minimal access for testing purposes
 
-Access these presets through the HTML interface or copy the code from the examples.
+Each preset generates a URL that you can bookmark or share with your team.
 
 ## Development
 
@@ -244,9 +255,28 @@ npm run clean
    - `build-html.js` injects the bookmarklet URL into the HTML template
 3. **Output** in `dist/` directory contains the deployable files
 
-## Future Plans
+## Features
 
-- [x] Create bookmarklet version for easy installation
-- [x] Add URL parameter parsing for configuration sharing
-- [x] Create static HTML page for bookmarklet generation
-- [x] Add preset configurations for common use cases
+- 🚀 **Smart Auto-detection**: Automatically applies URL parameters or saves current configuration
+- 🔗 **URL-based Configuration**: Share PAT configurations via URL parameters
+- ⚡ **Parallel Permission Setting**: Sets multiple permissions simultaneously for speed
+- 📋 **Preset Configurations**: Common token types ready to use
+- 🎨 **Modern UI**: Beautiful interface built with Tailwind CSS
+- 🔒 **No Server Required**: Runs entirely in your browser
+
+## Browser Compatibility
+
+Works with all modern browsers that support:
+- ES6+ JavaScript
+- Async/await
+- URL and URLSearchParams APIs
+
+Tested on Chrome, Firefox, Safari, and Edge.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
