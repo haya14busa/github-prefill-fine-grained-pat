@@ -58,6 +58,39 @@ Then visit http://localhost:8080 and drag the bookmarklet button to your bookmar
    - **If form has values:** Saves to URL & copies shareable link
    - **If both are empty:** Makes helper functions available in the console
 
+### URL Parameters
+
+The bookmarklet works with URL parameters to enable configuration sharing. When you visit a URL with parameters, the bookmarklet will automatically apply them.
+
+#### Supported URL Parameters
+
+- `name` - Token name
+- `description` - Token description
+- `owner` - Resource owner (username or organization)
+- `expiration` - Expiration days (7, 30, 60, 90, "custom", "none", or any number for custom days)
+- `expiration_date` - Custom expiration date (YYYY-MM-DD) when expiration=custom
+- `repo_access` - Repository access type ("none", "all", or "selected")
+- `repos` - Comma-separated list of repositories (when repo_access=selected, supports both `repo` and `owner/repo` formats)
+- `permissions` - Comma-separated permission pairs (format: `resource:level`)
+
+#### Example URLs
+
+```
+# Basic CI/CD token
+https://github.com/settings/personal-access-tokens/new?name=CI+Token&expiration=30&repo_access=all&permissions=contents:read,metadata:read
+
+# Organization token with specific repos (both formats work)
+https://github.com/settings/personal-access-tokens/new?owner=my-org&name=Deploy+Token&repo_access=selected&repos=api,frontend&permissions=contents:write,packages:write
+https://github.com/settings/personal-access-tokens/new?owner=my-org&name=Deploy+Token&repo_access=selected&repos=my-org/api,my-org/frontend&permissions=contents:write,packages:write
+
+# Custom expiration date
+https://github.com/settings/personal-access-tokens/new?name=Long+Term+Token&expiration=custom&expiration_date=2025-12-31
+
+# Non-standard expiration days (e.g., 1 day, 14 days)
+https://github.com/settings/personal-access-tokens/new?name=Short+Token&expiration=1
+https://github.com/settings/personal-access-tokens/new?name=Two+Week+Token&expiration=14
+```
+
 ### Manual Functions (Advanced)
 
 While the bookmarklet handles most use cases automatically, you can also use these functions manually in the browser console:
@@ -162,9 +195,7 @@ ghPat.getExpiration();
 - `'read'` - Read-only access
 - `'write'` - Read and write access
 
-### URL Parameters
-
-The tool automatically applies configuration from URL parameters when the bookmarklet is executed. You can also manually control this:
+#### URL Control Functions
 
 ```javascript
 // Manually apply configuration from URL parameters
@@ -182,40 +213,6 @@ ghPat.openConfigUrl();
 
 // Update current URL with configuration (without reloading)
 ghPat.updateUrlParams();
-```
-
-When you run the bookmarklet, it automatically decides what to do:
-- **If URL has parameters and form is empty**: Applies the configuration from URL
-- **If form has values**: Updates the URL and copies the configuration link to clipboard
-- **If both are empty**: Does nothing, ready for manual use
-
-#### Supported URL Parameters
-
-- `name` - Token name
-- `description` - Token description
-- `owner` - Resource owner (username or organization)
-- `expiration` - Expiration days (7, 30, 60, 90, "custom", "none", or any number for custom days)
-- `expiration_date` - Custom expiration date (YYYY-MM-DD) when expiration=custom
-- `repo_access` - Repository access type ("none", "all", or "selected")
-- `repos` - Comma-separated list of repositories (when repo_access=selected, supports both `repo` and `owner/repo` formats)
-- `permissions` - Comma-separated permission pairs (format: `resource:level`)
-
-#### Example URLs
-
-```
-# Basic CI/CD token
-https://github.com/settings/personal-access-tokens/new?name=CI+Token&expiration=30&repo_access=all&permissions=contents:read,metadata:read
-
-# Organization token with specific repos (both formats work)
-https://github.com/settings/personal-access-tokens/new?owner=my-org&name=Deploy+Token&repo_access=selected&repos=api,frontend&permissions=contents:write,packages:write
-https://github.com/settings/personal-access-tokens/new?owner=my-org&name=Deploy+Token&repo_access=selected&repos=my-org/api,my-org/frontend&permissions=contents:write,packages:write
-
-# Custom expiration date
-https://github.com/settings/personal-access-tokens/new?name=Long+Term+Token&expiration=custom&expiration_date=2025-12-31
-
-# Non-standard expiration days (e.g., 1 day, 14 days)
-https://github.com/settings/personal-access-tokens/new?name=Short+Token&expiration=1
-https://github.com/settings/personal-access-tokens/new?name=Two+Week+Token&expiration=14
 ```
 
 ## Preset Configurations
