@@ -11,7 +11,23 @@ Creating GitHub fine-grained PATs requires filling many form fields and selectin
 
 ## Solution
 
-This tool provides JavaScript functions that can be run as a bookmarklet to automatically fill the PAT creation form based on predefined configurations.
+A bookmarklet that automates form filling on GitHub's PAT creation page. Click the bookmarklet and it will:
+- Automatically apply configurations from URL parameters
+- Save and share your current form configuration
+- Provide helper functions for advanced automation
+
+No server, no API calls, no stored credentials - just client-side DOM manipulation to save you time.
+
+## How It Works
+
+The bookmarklet injects JavaScript directly into GitHub's PAT creation page that:
+
+1. **Finds form elements** by their IDs and CSS selectors
+2. **Fills inputs** by setting values and dispatching proper events
+3. **Clicks buttons** to open dropdowns and select options
+4. **Reads current values** to generate shareable configuration URLs
+
+All operations happen in your browser. The bookmarklet simply automates the clicks and typing you would do manually. It respects GitHub's form validation and security measures - it just does the repetitive work faster.
 
 ## Installation
 
@@ -40,9 +56,13 @@ Then visit http://localhost:8080 and drag the bookmarklet button to your bookmar
 3. The bookmarklet automatically:
    - **If URL has parameters & form is empty:** Applies the configuration
    - **If form has values:** Saves to URL & copies shareable link
-   - **If both are empty:** Loads helper functions for manual use
+   - **If both are empty:** Makes helper functions available in the console
 
-### Token Name and Description
+### Manual Functions (Advanced)
+
+While the bookmarklet handles most use cases automatically, you can also use these functions manually in the browser console:
+
+#### Token Name and Description
 
 ```javascript
 // Set token name
@@ -58,7 +78,7 @@ ghPat.setTokenDescription('Used for automated deployments and testing in product
 ghPat.getTokenDescription();
 ```
 
-### Resource Owner
+#### Resource Owner
 
 ```javascript
 // Set resource owner (personal account or organization)
@@ -75,7 +95,7 @@ ghPat.getAvailableResourceOwners();
 // [{name: 'haya14busa', isOrganization: false, limit: null, limitLabel: null}, ...]
 ```
 
-### Basic Functions
+#### Basic Functions
 
 ```javascript
 // List all available permissions on the page
@@ -95,7 +115,7 @@ await ghPat.setMultiplePermissions({
 });
 ```
 
-### Repository Access
+#### Repository Access
 
 ```javascript
 // Set repository access type
@@ -116,7 +136,7 @@ ghPat.clearAllRepositories();
 ghPat.getSelectedRepositories();
 ```
 
-### Token Expiration
+#### Token Expiration
 
 ```javascript
 // Set token expiration
@@ -136,7 +156,7 @@ ghPat.getExpiration();
 // Returns: {type: 'days', days: 30} or {type: 'custom', date: '2025-12-31'} or {type: 'none'}
 ```
 
-### Permission Values
+#### Permission Values
 
 - `'none'` - No access
 - `'read'` - Read-only access
