@@ -131,15 +131,33 @@ window.ghPat.setPermission = function(resourceName, accessLevel) {
   return false;
 }
 
-// Set multiple permissions at once
-window.ghPat.setMultiplePermissions = function(permissions) {
-  let delay = 0;
+// Set multiple permissions at once (runs in parallel)
+window.ghPat.setMultiplePermissions = async function(permissions) {
+  const promises = [];
+  
+  // Create promises for all permission changes
   for (const [resource, access] of Object.entries(permissions)) {
-    setTimeout(() => {
-      window.ghPat.setPermission(resource, access);
-    }, delay);
-    delay += 200; // Add delay between operations
+    promises.push(
+      new Promise((resolve) => {
+        // Small random delay to avoid overwhelming the UI
+        const delay = Math.random() * 100;
+        setTimeout(() => {
+          const result = window.ghPat.setPermission(resource, access);
+          resolve({ resource, access, result });
+        }, delay);
+      })
+    );
   }
+  
+  // Execute all permission changes in parallel
+  const results = await Promise.all(promises);
+  
+  // Log summary
+  const successful = results.filter(r => r.result).length;
+  const failed = results.filter(r => !r.result).length;
+  console.log(`Set ${successful} permissions successfully, ${failed} failed`);
+  
+  return results;
 }
 
 // List all available permissions on the current page

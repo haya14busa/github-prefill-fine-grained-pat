@@ -78,8 +78,8 @@ ghPat.getCurrentPermissions();
 // Set a single permission
 ghPat.setPermission('contents', 'read');
 
-// Set multiple permissions at once
-ghPat.setMultiplePermissions({
+// Set multiple permissions at once (runs in parallel, returns a Promise)
+await ghPat.setMultiplePermissions({
   'contents': 'read',
   'issues': 'write',
   'pull_requests': 'write'
