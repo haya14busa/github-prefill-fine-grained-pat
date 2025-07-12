@@ -4,255 +4,319 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GitHub Fine-grained PAT Helper</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.6;
-            color: #333;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        github: {
+                            blue: '#0969da',
+                            green: '#2ea44f',
+                            darkgreen: '#2c974b',
+                        }
+                    }
+                }
+            }
         }
-        h1, h2 {
-            color: #0969da;
-        }
-        .bookmarklet-button {
-            display: inline-block;
-            background: #0969da;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
-            margin: 10px 0;
-        }
-        .bookmarklet-button:hover {
-            background: #0860ca;
-        }
-        .preset {
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 15px;
-            margin: 10px 0;
-            background: #f6f8fa;
-        }
-        .preset h3 {
-            margin-top: 0;
-            color: #0969da;
-        }
-        .preset button, .preset a.button {
-            background: #2ea44f;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 10px;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .preset button:hover, .preset a.button:hover {
-            background: #2c974b;
-        }
-        .preset pre {
-            margin: 10px 0;
-            font-size: 12px;
-        }
-        code {
-            background: #f6f8fa;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'SF Mono', Monaco, Consolas, monospace;
-            font-size: 85%;
-        }
-        pre {
-            background: #f6f8fa;
-            padding: 16px;
-            border-radius: 6px;
-            overflow-x: auto;
-        }
-        .instructions {
-            background: #ddf4ff;
-            border: 1px solid #54a3ff;
-            border-radius: 6px;
-            padding: 15px;
-            margin: 20px 0;
-        }
-        .config-builder {
-            background: #f6f8fa;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .permission-group {
-            margin: 15px 0;
-        }
-        .permission-group label {
-            display: block;
-            margin: 5px 0;
-        }
-        select {
-            padding: 4px 8px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            margin-left: 10px;
-        }
-        #generated-code {
-            background: #1b1f23;
-            color: #e1e4e8;
-            padding: 15px;
-            border-radius: 6px;
-            font-family: 'SF Mono', Monaco, Consolas, monospace;
-            font-size: 14px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-    </style>
+    </script>
 </head>
-<body>
-    <h1>GitHub Fine-grained PAT Helper</h1>
-    
-    <div class="instructions">
-        <h2>🚀 Quick Start</h2>
-        <p><strong>Drag this button to your bookmarks bar:</strong></p>
-        <a href="javascript:(function(){window.ghPat={setPermission:function(resourceName,accessLevel){const permissionRows=document.querySelectorAll('li.js-list-group-item');for(const row of permissionRows){const buttons=row.querySelectorAll('button[data-resource]');for(const button of buttons){if(button.getAttribute('data-resource')===resourceName){const dropdownButton=row.querySelector('.js-action-selection-list-menu-button');if(!dropdownButton){console.error(`Dropdown button not found for ${resourceName}`);return false;}dropdownButton.click();setTimeout(()=>{const targetButton=row.querySelector(`button[data-resource=&quot;${resourceName}&quot;][data-value=&quot;${accessLevel}&quot;]`);if(targetButton){targetButton.click();console.log(`Set ${resourceName} to ${accessLevel}`);}else{console.error(`Button not found for ${resourceName} with ${accessLevel} access`);}},100);return true;}}}console.error(`Permission ${resourceName} not found`);return false;},setMultiplePermissions:function(permissions){let delay=0;for(const[resource,access]of Object.entries(permissions)){setTimeout(()=>{this.setPermission(resource,access);},delay);delay+=200;}},listAvailablePermissions:function(){const permissions={};const permissionRows=document.querySelectorAll('li.js-list-group-item');permissionRows.forEach(row=>{const titleElement=row.querySelector('strong');if(!titleElement)return;const permissionTitle=titleElement.textContent.trim();const resourceButton=row.querySelector('button[data-resource]');if(!resourceButton)return;const resourceName=resourceButton.getAttribute('data-resource');const resourceParent=resourceButton.getAttribute('data-resource-parent');const currentButton=row.querySelector('.js-action-selection-list-menu-button');let currentAccess='none';if(currentButton){const buttonText=currentButton.textContent.trim();if(buttonText.includes('Read and write'))currentAccess='write';else if(buttonText.includes('Read-only'))currentAccess='read';else if(buttonText.includes('No access'))currentAccess='none';}const availableLevels=[];row.querySelectorAll('button[data-value]').forEach(btn=>{const value=btn.getAttribute('data-value');if(value)availableLevels.push(value);});permissions[resourceName]={title:permissionTitle,parent:resourceParent,currentAccess:currentAccess,availableLevels:[...new Set(availableLevels)]};});console.log('Available permissions:');console.table(permissions);return permissions;},getCurrentPermissions:function(){const permissions=this.listAvailablePermissions();const current={};for(const[resource,info]of Object.entries(permissions)){if(info.currentAccess!=='none'){current[resource]=info.currentAccess;}}console.log('Current non-zero permissions:');console.log(current);return current;},setRepositoryAccess:function(accessType){const radioButtons={'none':document.getElementById('install_target_none'),'all':document.getElementById('install_target_all'),'selected':document.getElementById('install_target_selected')};const targetRadio=radioButtons[accessType];if(!targetRadio){console.error(`Invalid repository access type: ${accessType}. Use 'none', 'all', or 'selected'`);return false;}targetRadio.click();console.log(`Set repository access to: ${accessType}`);if(accessType==='selected'){console.log('Note: You will need to select specific repositories manually or use selectRepositories() function');}return true;},getRepositoryAccess:function(){const radioButtons=document.querySelectorAll('input[name=&quot;install_target&quot;]');for(const radio of radioButtons){if(radio.checked){const value=radio.value;let description='';switch(value){case'none':description='Public repositories only (read-only)';break;case'all':description='All repositories (current and future)';break;case'selected':description='Selected repositories only';break;}console.log(`Current repository access: ${value} - ${description}`);return value;}}console.log('No repository access type selected');return null;},selectRepositories:function(repoNames){console.log('Note: This function now processes repositories sequentially. Please wait for completion.');if(this.getRepositoryAccess()!=='selected'){console.log('Setting repository access to &quot;selected&quot; first...');this.setRepositoryAccess('selected');}setTimeout(()=>{const selectButton=document.querySelector('#repository-menu-list-button');if(!selectButton){console.error('Repository picker button not found');return;}selectButton.click();console.log('Opening repository picker...');setTimeout(()=>{this.clearAllRepositories();let currentIndex=0;const processNextRepo=()=>{if(currentIndex>=repoNames.length){setTimeout(()=>{const closeButton=document.querySelector('[data-close-dialog-id=&quot;repository-menu-list-dialog&quot;]');if(closeButton){closeButton.click();}else{const dialog=document.querySelector('#repository-menu-list-dialog');if(dialog){document.body.click();}}console.log('Repository selection completed');},500);return;}const repoName=repoNames[currentIndex];console.log(`Processing repository ${currentIndex+1}/${repoNames.length}: ${repoName}`);const searchInput=document.querySelector('#repository-menu-list-filter');if(!searchInput){console.error('Search input not found');return;}searchInput.value='';searchInput.dispatchEvent(new Event('input',{bubbles:true}));searchInput.value=repoName;searchInput.dispatchEvent(new Event('input',{bubbles:true}));let retries=0;const maxRetries=5;const trySelect=()=>{const repoButtons=document.querySelectorAll('button[role=&quot;option&quot;]');let found=false;for(const button of repoButtons){if(button.textContent.trim().includes(repoName)){button.click();console.log(`Selected: ${repoName}`);found=true;currentIndex++;setTimeout(processNextRepo,800);break;}}if(!found){retries++;if(retries<maxRetries){console.log(`Retrying ${repoName} (${retries}/${maxRetries})...`);setTimeout(trySelect,300);}else{console.error(`Failed to find: ${repoName}`);currentIndex++;setTimeout(processNextRepo,300);}}};setTimeout(trySelect,500);};setTimeout(processNextRepo,1000);},1500);},500);},addRepository:function(repoName){console.log('Note: Use selectRepositories() for better sequential processing');},clearAllRepositories:function(){const removeButtons=document.querySelectorAll('.js-repository-picker-remove');removeButtons.forEach(button=>{button.click();});console.log(`Cleared ${removeButtons.length} repositories`);},getSelectedRepositories:function(){const selectedRepos=[];const repoElements=document.querySelectorAll('.js-repository-picker-result .repo-and-owner');repoElements.forEach(element=>{const repoName=element.textContent.trim();selectedRepos.push(repoName);});console.log('Currently selected repositories:');console.log(selectedRepos);return selectedRepos;}};console.log('GitHub PAT Helper loaded! Available functions:');console.log('- ghPat.setPermission(resource, level)');console.log('- ghPat.setMultiplePermissions({resource: level, ...})');console.log('- ghPat.listAvailablePermissions()');console.log('- ghPat.getCurrentPermissions()');console.log('- ghPat.setRepositoryAccess(type)');console.log('- ghPat.getRepositoryAccess()');console.log('- ghPat.selectRepositories([repo1, repo2, ...])');console.log('- ghPat.clearAllRepositories()');console.log('- ghPat.getSelectedRepositories()');})();" class="bookmarklet-button">GitHub PAT Helper</a>
-        
-        <h3>How it works:</h3>
-        <ol>
-            <li>Navigate to <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">GitHub's PAT creation page</a></li>
-            <li>Click the bookmarklet in your bookmarks bar</li>
-            <li>The bookmarklet automatically:
-                <ul>
-                    <li><strong>If the URL has parameters and form is empty:</strong> Applies the configuration from URL</li>
-                    <li><strong>If the form has values:</strong> Saves current configuration to URL and copies shareable link</li>
-                    <li><strong>If both are empty:</strong> Does nothing, but loads helper functions for manual use</li>
-                </ul>
-            </li>
-        </ol>
-        
-        <h3>Typical workflows:</h3>
-        <ul>
-            <li><strong>Apply shared configuration:</strong> Visit a URL with parameters (like the presets below) → Click bookmarklet → Configuration is applied automatically</li>
-            <li><strong>Share your configuration:</strong> Fill out the form manually → Click bookmarklet → URL is updated and link is copied to clipboard</li>
-        </ul>
+<body class="bg-gray-50">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-github-blue to-blue-700 text-white">
+        <div class="max-w-6xl mx-auto px-4 py-12">
+            <h1 class="text-4xl font-bold mb-4">GitHub Fine-grained PAT Helper</h1>
+            <p class="text-xl opacity-90">Automate token creation with smart URL parameters</p>
+        </div>
     </div>
 
-    <h2>📋 Preset Configurations</h2>
-    
-    <div class="preset">
-        <h3>CI/CD Token (Read-only)</h3>
-        <p>Suitable for continuous integration workflows that need to read code and download packages.</p>
-        <pre><code>https://github.com/settings/personal-access-tokens/new?name=CI%2FCD+Read-only+Token&description=Automated+CI%2FCD+workflow+-+read+access+only&expiration=30&repo_access=all&permissions=contents:read,metadata:read,packages:read</code></pre>
-        <a href="https://github.com/settings/personal-access-tokens/new?name=CI%2FCD+Read-only+Token&description=Automated+CI%2FCD+workflow+-+read+access+only&expiration=30&repo_access=all&permissions=contents:read,metadata:read,packages:read" target="_blank" class="preset button">Open Configuration</a>
-        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Quick Start Section -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="text-3xl mr-3">🚀</span> Quick Start
+            </h2>
+            
+            <div class="text-center mb-8">
+                <p class="text-lg text-gray-600 mb-4">Drag this button to your bookmarks bar:</p>
+                <a href="<!--BOOKMARKLET_URL-->" class="inline-block bg-github-blue hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 transform hover:scale-105">
+                    GitHub PAT Helper
+                </a>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">How it works:</h3>
+                    <ol class="space-y-3 text-gray-600">
+                        <li class="flex items-start">
+                            <span class="bg-github-blue text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">1</span>
+                            <span>Navigate to <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" class="text-github-blue hover:underline">GitHub's PAT creation page</a></span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-github-blue text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">2</span>
+                            <span>Click the bookmarklet in your bookmarks bar</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-github-blue text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">3</span>
+                            <div>
+                                <p class="mb-2">The bookmarklet automatically:</p>
+                                <ul class="space-y-2 ml-4">
+                                    <li class="flex items-start">
+                                        <span class="text-green-500 mr-2">✓</span>
+                                        <span><strong>URL has parameters & form is empty:</strong> Applies configuration</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-green-500 mr-2">✓</span>
+                                        <span><strong>Form has values:</strong> Saves to URL & copies link</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-green-500 mr-2">✓</span>
+                                        <span><strong>Both empty:</strong> Loads helper functions</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Typical workflows:</h3>
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 border-l-4 border-github-blue p-4 rounded">
+                            <h4 class="font-semibold text-gray-800 mb-1">Apply shared configuration:</h4>
+                            <p class="text-gray-600">Visit URL with parameters → Click bookmarklet → Auto-applied!</p>
+                        </div>
+                        <div class="bg-green-50 border-l-4 border-github-green p-4 rounded">
+                            <h4 class="font-semibold text-gray-800 mb-1">Share your configuration:</h4>
+                            <p class="text-gray-600">Fill form → Click bookmarklet → URL copied to clipboard!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preset Configurations -->
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+            <span class="text-3xl mr-3">📋</span> Preset Configurations
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">CI/CD Token (Read-only)</h3>
+                <p class="text-gray-600 mb-4">Suitable for continuous integration workflows that need to read code and download packages.</p>
+                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=CI%2FCD+Read-only+Token&description=Automated+CI%2FCD+workflow+-+read+access+only&expiration=30&repo_access=all&permissions=contents:read,metadata:read,packages:read</code>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=CI%2FCD+Read-only+Token&description=Automated+CI%2FCD+workflow+-+read+access+only&expiration=30&repo_access=all&permissions=contents:read,metadata:read,packages:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Open Configuration
+                    </a>
+                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Copy URL
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Read All Permissions</h3>
+                <p class="text-gray-600 mb-4">Read access to all available permissions for comprehensive monitoring or backup.</p>
+                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Read+All+Token&description=Read+access+to+all+permissions&expiration=30&repo_access=all&permissions=actions:read,administration:read,checks:read,contents:read,deployments:read,environments:read,issues:read,metadata:read,packages:read,pages:read,pull_requests:read,repository_hooks:read,repository_projects:read,security_events:read,statuses:read,vulnerability_alerts:read</code>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=Read+All+Token&description=Read+access+to+all+permissions&expiration=30&repo_access=all&permissions=actions:read,administration:read,checks:read,contents:read,deployments:read,environments:read,issues:read,metadata:read,packages:read,pages:read,pull_requests:read,repository_hooks:read,repository_projects:read,security_events:read,statuses:read,vulnerability_alerts:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Open Configuration
+                    </a>
+                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Copy URL
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                <h3 class="text-xl font-bold text-red-700 mb-2">Write All Permissions ⚠️</h3>
+                <p class="text-gray-600 mb-4">Full write access to all permissions (use with extreme caution!).</p>
+                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Write+All+Token&description=Full+write+access+-+use+with+caution&expiration=7&repo_access=selected&permissions=actions:write,administration:write,checks:write,contents:write,deployments:write,environments:write,issues:write,metadata:read,packages:write,pages:write,pull_requests:write,repository_hooks:write,repository_projects:write,security_events:write,statuses:write,vulnerability_alerts:write</code>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=Write+All+Token&description=Full+write+access+-+use+with+caution&expiration=7&repo_access=selected&permissions=actions:write,administration:write,checks:write,contents:write,deployments:write,environments:write,issues:write,metadata:read,packages:write,pages:write,pull_requests:write,repository_hooks:write,repository_projects:write,security_events:write,statuses:write,vulnerability_alerts:write" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Open Configuration
+                    </a>
+                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Copy URL
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Development Token</h3>
+                <p class="text-gray-600 mb-4">For local development with ability to push code and manage issues/PRs.</p>
+                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Development+Token&description=Local+development+access&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read</code>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=Development+Token&description=Local+development+access&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Open Configuration
+                    </a>
+                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Copy URL
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Release Automation</h3>
+                <p class="text-gray-600 mb-4">For automated release workflows that need to create releases and upload packages.</p>
+                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Release+Automation&description=Automated+release+workflow&expiration=90&repo_access=selected&permissions=contents:write,packages:write,metadata:read,actions:read</code>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=Release+Automation&description=Automated+release+workflow&expiration=90&repo_access=selected&permissions=contents:write,packages:write,metadata:read,actions:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Open Configuration
+                    </a>
+                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Copy URL
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Minimal Token</h3>
+                <p class="text-gray-600 mb-4">Minimal access for testing or verification purposes.</p>
+                <div class="bg-gray-100 rounded p-3 mb-4 overflow-x-auto">
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=Minimal+Token&description=Minimal+access+for+testing&expiration=1&repo_access=none&permissions=metadata:read</code>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="https://github.com/settings/personal-access-tokens/new?name=Minimal+Token&description=Minimal+access+for+testing&expiration=1&repo_access=none&permissions=metadata:read" target="_blank" class="bg-github-green hover:bg-github-darkgreen text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Open Configuration
+                    </a>
+                    <button onclick="copyToClipboard(this.parentElement.previousElementSibling.querySelector('code').textContent)" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Copy URL
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Guide -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="text-3xl mr-3">📚</span> Usage Guide
+            </h2>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Available Functions</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.setTokenName(name)</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.setTokenDescription(description)</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.setPermission(resource, level)</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.setMultiplePermissions({...})</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.setRepositoryAccess(type)</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.selectRepositories([...])</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.setExpiration(days)</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.setResourceOwner(owner)</code>
+                    </div>
+                    <div class="space-y-2">
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.getTokenName()</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.getTokenDescription()</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.getCurrentPermissions()</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.listAvailablePermissions()</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.getRepositoryAccess()</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.getSelectedRepositories()</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.getExpiration()</code>
+                        <code class="block bg-gray-100 p-2 rounded text-sm">ghPat.getResourceOwner()</code>
+                    </div>
+                </div>
+                <div class="mt-4 space-y-2">
+                    <code class="block bg-blue-100 p-2 rounded text-sm text-blue-800">ghPat.applyFromUrlParams() - Apply configuration from URL</code>
+                    <code class="block bg-blue-100 p-2 rounded text-sm text-blue-800">ghPat.generateConfigUrl() - Generate URL with current config</code>
+                    <code class="block bg-blue-100 p-2 rounded text-sm text-blue-800">ghPat.copyConfigUrl() - Copy config URL to clipboard</code>
+                    <code class="block bg-blue-100 p-2 rounded text-sm text-blue-800">ghPat.updateUrlParams() - Update URL without reload</code>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">URL Parameter Configuration</h3>
+                <p class="text-gray-600 mb-4">You can share token configurations using URL parameters. The tool will automatically detect and apply them.</p>
+                
+                <div class="bg-gray-100 rounded p-4 mb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Example URL:</h4>
+                    <code class="text-sm text-gray-800 break-all">https://github.com/settings/personal-access-tokens/new?name=CI+Token&expiration=30&repo_access=all&permissions=contents:read,metadata:read</code>
+                </div>
+
+                <h4 class="font-semibold text-gray-800 mb-3">Supported Parameters:</h4>
+                <div class="space-y-2 text-gray-600">
+                    <div class="flex">
+                        <code class="bg-gray-200 px-2 py-1 rounded text-sm font-mono mr-3">name</code>
+                        <span>Token name</span>
+                    </div>
+                    <div class="flex">
+                        <code class="bg-gray-200 px-2 py-1 rounded text-sm font-mono mr-3">description</code>
+                        <span>Token description</span>
+                    </div>
+                    <div class="flex">
+                        <code class="bg-gray-200 px-2 py-1 rounded text-sm font-mono mr-3">owner</code>
+                        <span>Resource owner</span>
+                    </div>
+                    <div class="flex items-start">
+                        <code class="bg-gray-200 px-2 py-1 rounded text-sm font-mono mr-3">expiration</code>
+                        <div>
+                            <p>Expiration days</p>
+                            <ul class="mt-1 text-sm space-y-1">
+                                <li>• Standard: 7, 30, 60, 90</li>
+                                <li>• Special: "custom", "none"</li>
+                                <li>• Any number (e.g., 1, 14, 365) - auto-converted to date</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="flex">
+                        <code class="bg-gray-200 px-2 py-1 rounded text-sm font-mono mr-3">expiration_date</code>
+                        <span>Custom date (YYYY-MM-DD)</span>
+                    </div>
+                    <div class="flex">
+                        <code class="bg-gray-200 px-2 py-1 rounded text-sm font-mono mr-3">repo_access</code>
+                        <span>Repository access (none, all, selected)</span>
+                    </div>
+                    <div class="flex">
+                        <code class="bg-gray-200 px-2 py-1 rounded text-sm font-mono mr-3">repos</code>
+                        <span>Comma-separated repositories</span>
+                    </div>
+                    <div class="flex">
+                        <code class="bg-gray-200 px-2 py-1 rounded text-sm font-mono mr-3">permissions</code>
+                        <span>Format: resource:level,resource:level</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="preset">
-        <h3>Read All Permissions</h3>
-        <p>Read access to all available permissions for comprehensive monitoring or backup.</p>
-        <pre><code>https://github.com/settings/personal-access-tokens/new?name=Read+All+Token&description=Read+access+to+all+permissions&expiration=30&repo_access=all&permissions=actions:read,administration:read,checks:read,contents:read,deployments:read,environments:read,issues:read,metadata:read,packages:read,pages:read,pull_requests:read,repository_hooks:read,repository_projects:read,security_events:read,statuses:read,vulnerability_alerts:read</code></pre>
-        <a href="https://github.com/settings/personal-access-tokens/new?name=Read+All+Token&description=Read+access+to+all+permissions&expiration=30&repo_access=all&permissions=actions:read,administration:read,checks:read,contents:read,deployments:read,environments:read,issues:read,metadata:read,packages:read,pages:read,pull_requests:read,repository_hooks:read,repository_projects:read,security_events:read,statuses:read,vulnerability_alerts:read" target="_blank" class="preset button">Open Configuration</a>
-        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
-    </div>
-
-    <div class="preset">
-        <h3>Write All Permissions</h3>
-        <p>Full write access to all permissions (use with extreme caution!).</p>
-        <pre><code>https://github.com/settings/personal-access-tokens/new?name=Write+All+Token&description=Full+write+access+-+use+with+caution&expiration=7&repo_access=selected&permissions=actions:write,administration:write,checks:write,contents:write,deployments:write,environments:write,issues:write,metadata:read,packages:write,pages:write,pull_requests:write,repository_hooks:write,repository_projects:write,security_events:write,statuses:write,vulnerability_alerts:write</code></pre>
-        <a href="https://github.com/settings/personal-access-tokens/new?name=Write+All+Token&description=Full+write+access+-+use+with+caution&expiration=7&repo_access=selected&permissions=actions:write,administration:write,checks:write,contents:write,deployments:write,environments:write,issues:write,metadata:read,packages:write,pages:write,pull_requests:write,repository_hooks:write,repository_projects:write,security_events:write,statuses:write,vulnerability_alerts:write" target="_blank" class="preset button">Open Configuration</a>
-        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
-    </div>
-
-    <div class="preset">
-        <h3>Development Token</h3>
-        <p>For local development with ability to push code and manage issues/PRs.</p>
-        <pre><code>https://github.com/settings/personal-access-tokens/new?name=Development+Token&description=Local+development+access&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read</code></pre>
-        <a href="https://github.com/settings/personal-access-tokens/new?name=Development+Token&description=Local+development+access&expiration=7&repo_access=selected&permissions=contents:write,issues:write,pull_requests:write,metadata:read" target="_blank" class="preset button">Open Configuration</a>
-        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
-    </div>
-
-    <div class="preset">
-        <h3>Release Automation</h3>
-        <p>For automated release workflows that need to create releases and upload packages.</p>
-        <pre><code>https://github.com/settings/personal-access-tokens/new?name=Release+Automation&description=Automated+release+workflow&expiration=90&repo_access=selected&permissions=contents:write,packages:write,metadata:read,actions:read</code></pre>
-        <a href="https://github.com/settings/personal-access-tokens/new?name=Release+Automation&description=Automated+release+workflow&expiration=90&repo_access=selected&permissions=contents:write,packages:write,metadata:read,actions:read" target="_blank" class="preset button">Open Configuration</a>
-        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
-    </div>
-
-    <div class="preset">
-        <h3>Minimal Token</h3>
-        <p>Minimal access for testing or verification purposes.</p>
-        <pre><code>https://github.com/settings/personal-access-tokens/new?name=Minimal+Token&description=Minimal+access+for+testing&expiration=1&repo_access=none&permissions=metadata:read</code></pre>
-        <a href="https://github.com/settings/personal-access-tokens/new?name=Minimal+Token&description=Minimal+access+for+testing&expiration=1&repo_access=none&permissions=metadata:read" target="_blank" class="preset button">Open Configuration</a>
-        <button onclick="copyToClipboard(this.previousElementSibling.previousElementSibling.textContent)">Copy URL</button>
-    </div>
-
-
-    <h2>📚 Usage Guide</h2>
-    <h3>Available Functions</h3>
-    <ul>
-        <li><code>ghPat.setTokenName(name)</code> - Set the token name</li>
-        <li><code>ghPat.getTokenName()</code> - Get current token name</li>
-        <li><code>ghPat.setTokenDescription(description)</code> - Set the token description</li>
-        <li><code>ghPat.getTokenDescription()</code> - Get current token description</li>
-        <li><code>ghPat.setPermission(resource, level)</code> - Set a single permission</li>
-        <li><code>ghPat.setMultiplePermissions({resource: level, ...})</code> - Set multiple permissions at once</li>
-        <li><code>ghPat.listAvailablePermissions()</code> - List all available permissions on the page</li>
-        <li><code>ghPat.getCurrentPermissions()</code> - Get current permission settings</li>
-        <li><code>ghPat.setRepositoryAccess(type)</code> - Set repository access type ('none', 'all', or 'selected')</li>
-        <li><code>ghPat.getRepositoryAccess()</code> - Get current repository access setting</li>
-        <li><code>ghPat.selectRepositories([repo1, repo2, ...])</code> - Select specific repositories</li>
-        <li><code>ghPat.clearAllRepositories()</code> - Clear all selected repositories</li>
-        <li><code>ghPat.getSelectedRepositories()</code> - Get list of currently selected repositories</li>
-        <li><code>ghPat.setExpiration(days)</code> - Set token expiration (7, 30, 60, 90, 'custom', or 'none')</li>
-        <li><code>ghPat.setExpiration('custom', 'YYYY-MM-DD')</code> - Set custom expiration date</li>
-        <li><code>ghPat.setCustomExpirationDate('YYYY-MM-DD')</code> - Set date after selecting custom</li>
-        <li><code>ghPat.getExpiration()</code> - Get current expiration setting</li>
-        <li><code>ghPat.setResourceOwner('owner-name')</code> - Set resource owner (user or organization)</li>
-        <li><code>ghPat.getResourceOwner()</code> - Get current resource owner</li>
-        <li><code>ghPat.getAvailableResourceOwners()</code> - List available resource owners</li>
-        <li><code>ghPat.applyFromUrlParams()</code> - Apply configuration from URL parameters</li>
-        <li><code>ghPat.generateConfigUrl()</code> - Generate URL with current configuration</li>
-        <li><code>ghPat.copyConfigUrl()</code> - Copy configuration URL to clipboard</li>
-        <li><code>ghPat.openConfigUrl()</code> - Open configuration URL in new tab</li>
-        <li><code>ghPat.updateUrlParams()</code> - Update current URL with configuration (no reload)</li>
-    </ul>
-
-    <h3>URL Parameter Configuration</h3>
-    <p>You can share token configurations using URL parameters. The tool will automatically detect and offer to apply them.</p>
-    
-    <h4>Example URL</h4>
-    <pre><code>https://github.com/settings/personal-access-tokens/new?name=CI+Token&expiration=30&repo_access=all&permissions=contents:read,metadata:read</code></pre>
-    
-    <h4>Supported Parameters</h4>
-    <ul>
-        <li><code>name</code> - Token name</li>
-        <li><code>description</code> - Token description</li>
-        <li><code>owner</code> - Resource owner</li>
-        <li><code>expiration</code> - Expiration days
-            <ul>
-                <li>Standard options: 7, 30, 60, 90</li>
-                <li>Special values: "custom", "none"</li>
-                <li>Any number (e.g., 1, 14, 365) - automatically converted to custom date</li>
-            </ul>
-        </li>
-        <li><code>expiration_date</code> - Custom date (YYYY-MM-DD) when expiration=custom</li>
-        <li><code>repo_access</code> - Repository access (none, all, selected)</li>
-        <li><code>repos</code> - Repositories (comma-separated, supports both "repo" and "owner/repo" formats)</li>
-        <li><code>permissions</code> - Permissions (format: resource:level,resource:level)</li>
-    </ul>
 
     <script>
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('Code copied to clipboard!');
+                // Create a temporary toast notification
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-y-full';
+                toast.textContent = 'URL copied to clipboard!';
+                document.body.appendChild(toast);
+                
+                // Animate in
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-full');
+                }, 100);
+                
+                // Animate out and remove
+                setTimeout(() => {
+                    toast.classList.add('translate-y-full');
+                    setTimeout(() => {
+                        document.body.removeChild(toast);
+                    }, 300);
+                }, 2000);
             }).catch(err => {
                 console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard. Please copy manually.');
             });
         }
-
     </script>
 </body>
 </html>
