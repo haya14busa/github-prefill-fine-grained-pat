@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-cli:
+    name: Build CLI binaries
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: '1.x'
+    
+    - name: Build for all platforms
+      working-directory: ./cli
+      run: |
+        mkdir -p dist
+        deno task compile:linux
+        deno task compile:macos
+        deno task compile:windows
+    
+    - name: Create checksums
+      working-directory: ./cli/dist
+      run: |
+        sha256sum github-pat-cli-* > checksums.txt
+        cat checksums.txt
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: cli-binaries
+        path: cli/dist/*
+        retention-days: 1
+
+  create-release:
+    name: Create GitHub Release
+    needs: build-cli
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: cli-binaries
+        path: cli/dist
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        draft: false
+        prerelease: false
+        files: |
+          cli/dist/github-pat-cli-linux
+          cli/dist/github-pat-cli-macos
+          cli/dist/github-pat-cli-windows.exe
+          cli/dist/checksums.txt
+        body: |
+          ## What's Changed
+          
+          <!-- Add release notes here -->
+          
+          ## CLI Installation
+          
+          ### Using Deno
+          ```bash
+          deno install --allow-read --allow-run -n github-pat-cli \
+            https://raw.githubusercontent.com/haya14busa/github-prefill-fine-grained-pat/${{ github.ref_name }}/cli/src/main.ts
+          ```
+          
+          ### Using precompiled binaries
+          
+          Download the appropriate binary for your platform:
+          - Linux: `github-pat-cli-linux`
+          - macOS: `github-pat-cli-macos`
+          - Windows: `github-pat-cli-windows.exe`
+          
+          Make it executable (Linux/macOS):
+          ```bash
+          chmod +x github-pat-cli-*
+          ```
+          
+          ## Checksums
+          
+          See `checksums.txt` for SHA256 checksums of all binaries.

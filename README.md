@@ -1,5 +1,8 @@
 # GitHub Fine-grained PAT Helper
 
+[![Test](https://github.com/haya14busa/github-prefill-fine-grained-pat/actions/workflows/test.yml/badge.svg)](https://github.com/haya14busa/github-prefill-fine-grained-pat/actions/workflows/test.yml)
+[![Deploy to GitHub Pages](https://github.com/haya14busa/github-prefill-fine-grained-pat/actions/workflows/deploy.yml/badge.svg)](https://github.com/haya14busa/github-prefill-fine-grained-pat/actions/workflows/deploy.yml)
+
 A bookmarklet tool to automate the creation of GitHub fine-grained personal access tokens.
 
 **Author:** haya14busa  
