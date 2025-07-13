@@ -63,9 +63,11 @@ Interactive mode (prompts for name and description):
 
 ```bash
 github-pat-cli
-# Token name: [github-prefill-fine-grained-pat 2025-01-13] _
+# Token name (max 40 chars): [github-prefill-fine-grained-pat 2025-01-13] _
 # Token description (optional): [Created by https://haya14busa.github.io/github-prefill-fine-grained-pat/] _
 ```
+
+Note: Token names are automatically truncated to 40 characters if too long.
 
 Generate URL with auto-detected git repository:
 

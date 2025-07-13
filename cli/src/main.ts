@@ -4,6 +4,7 @@ import { buildConfigFromCliOptions, parseCliArgs } from "./cli.ts";
 import { mergeConfigs, parseConfigFile } from "./config.ts";
 import { getCurrentGitRemote } from "./git.ts";
 import { buildUrl } from "./urlBuilder.ts";
+import { generateDefaultTokenName, validateTokenName } from "./utils.ts";
 import type { PatConfig } from "./types.ts";
 
 const HELP_TEXT = `GitHub Personal Access Token URL Generator
@@ -103,22 +104,18 @@ async function main() {
 
     // Prompt for name if not provided
     if (!config.name) {
-      // Create a timestamp in YYYY-MM-DD format
-      const now = new Date();
-      const dateStr = now.toISOString().split("T")[0];
+      const defaultName = generateDefaultTokenName(detectedRepo?.repo);
+      const inputName = prompt(`Token name (max 40 chars):`, defaultName);
 
-      const defaultName = detectedRepo
-        ? `${detectedRepo.repo} ${dateStr}`
-        : `GitHub PAT ${dateStr}`;
-
-      const inputName = prompt(`Token name:`, defaultName);
-
-      if (!inputName || inputName.trim() === "") {
-        console.error("Error: Token name is required.");
+      const trimmedName = inputName?.trim() || "";
+      const validationError = validateTokenName(trimmedName);
+      
+      if (validationError) {
+        console.error(`Error: ${validationError}`);
         Deno.exit(1);
       }
 
-      config.name = inputName.trim();
+      config.name = trimmedName;
     }
 
     // Optionally prompt for description if not provided

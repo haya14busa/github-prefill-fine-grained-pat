@@ -12,6 +12,13 @@ window.ghPat.setTokenName = function(name) {
     return false;
   }
   
+  // GitHub has a 40 character limit for token names
+  if (name.length > 40) {
+    console.warn(`Token name is too long (${name.length} chars). Maximum is 40 characters.`);
+    console.warn(`Truncating to: ${name.substring(0, 40)}`);
+    name = name.substring(0, 40);
+  }
+  
   nameInput.value = name;
   nameInput.dispatchEvent(new Event('input', { bubbles: true }));
   nameInput.dispatchEvent(new Event('change', { bubbles: true }));
