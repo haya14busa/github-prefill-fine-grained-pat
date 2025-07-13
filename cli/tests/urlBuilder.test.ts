@@ -24,8 +24,7 @@ Deno.test("buildUrl - full config", () => {
     },
   });
 
-  const expected =
-    "https://github.com/settings/personal-access-tokens/new?" +
+  const expected = "https://github.com/settings/personal-access-tokens/new?" +
     "name=CI+Token&description=Token+for+CI%2FCD&owner=myorg&" +
     "expiration=30&repo_access=selected&repos=api%2Cfrontend&" +
     "permissions=contents%3Awrite%2Cissues%3Aread%2Cmetadata%3Aread";

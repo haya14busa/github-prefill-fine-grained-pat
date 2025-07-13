@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --allow-read --allow-run
 
-import { parseCliArgs, buildConfigFromCliOptions } from "./cli.ts";
-import { parseConfigFile, mergeConfigs } from "./config.ts";
+import { buildConfigFromCliOptions, parseCliArgs } from "./cli.ts";
+import { mergeConfigs, parseConfigFile } from "./config.ts";
 import { getCurrentGitRemote } from "./git.ts";
 import { buildUrl } from "./urlBuilder.ts";
 import type { PatConfig } from "./types.ts";
@@ -10,6 +10,8 @@ const HELP_TEXT = `GitHub Personal Access Token URL Generator
 
 Usage: github-pat-cli [OPTIONS]
 
+If no options are provided, interactive mode will prompt for required values.
+
 Options:
   -n, --name <name>              Token name
   -o, --owner <owner>            Repository owner (auto-detected from git if not specified)
@@ -17,7 +19,7 @@ Options:
       --config <file>            Load configuration from YAML/JSON file
       --expiration <days>        Token expiration (number of days, "none", or "custom")
       --expiration-date <date>   Custom expiration date (YYYY-MM-DD)
-      --repo-access <access>     Repository access ("none", "all", or "selected")
+      --repo-access <access>     Repository access ("none", "all", or "selected", default: "selected")
       --repos <repos>            Comma-separated list of repositories
       --permissions <perms>      Comma-separated permissions (format: resource:level)
       --copy                     Copy URL to clipboard (requires pbcopy/xclip)
@@ -25,6 +27,9 @@ Options:
   -h, --help                     Show this help message
 
 Examples:
+  # Interactive mode (prompts for required values)
+  github-pat-cli
+
   # Generate URL with auto-detected git repository
   github-pat-cli --name "CI Token"
 
@@ -43,7 +48,7 @@ async function main() {
   const options = parseCliArgs(args);
 
   // Show help
-  if (options.help || args.length === 0) {
+  if (options.help) {
     console.log(HELP_TEXT);
     Deno.exit(0);
   }
@@ -56,33 +61,69 @@ async function main() {
       try {
         const fileConfig = await parseConfigFile(options.config);
         config = fileConfig;
-      } catch (error) {
-        console.error(`Error loading config file: ${error instanceof Error ? error.message : String(error)}`);
+      } catch (_error) {
+        console.error(
+          `Error loading config file: ${_error instanceof Error ? _error.message : String(_error)}`,
+        );
         Deno.exit(1);
       }
     }
 
     // Convert CLI options to config
     const cliConfig = buildConfigFromCliOptions(options);
-    
+
     // Merge configs (CLI overrides file)
     config = mergeConfigs(config, cliConfig);
 
-    // Auto-detect git repository if owner not specified
-    if (!config.owner) {
-      try {
-        const gitRemote = await getCurrentGitRemote();
-        config.owner = gitRemote.owner;
-        
-        // If repos not specified and we're in a git repo, suggest current repo
-        if (!config.repos && config.repoAccess === "selected") {
-          config.repos = [`${gitRemote.owner}/${gitRemote.repo}`];
-        }
-      } catch (error) {
-        // Git detection failed, continue without it
-        if (!options.config) {
-          console.warn("Warning: Could not detect git repository. Consider specifying --owner");
-        }
+    // Set default repo-access to "selected" if not specified
+    if (!config.repoAccess) {
+      config.repoAccess = "selected";
+    }
+
+    // Auto-detect git repository
+    let detectedRepo: { owner: string; repo: string } | null = null;
+    try {
+      detectedRepo = await getCurrentGitRemote();
+
+      // Use detected owner if not specified
+      if (!config.owner) {
+        config.owner = detectedRepo.owner;
+      }
+
+      // If repos not specified and we're in a git repo, suggest current repo
+      if (!config.repos && config.repoAccess === "selected") {
+        config.repos = [`${detectedRepo.owner}/${detectedRepo.repo}`];
+      }
+    } catch (_error) {
+      // Git detection failed, continue without it
+      if (!config.owner && !options.config) {
+        console.warn("Warning: Could not detect git repository. Consider specifying --owner");
+      }
+    }
+
+    // Prompt for name if not provided
+    if (!config.name) {
+      const defaultName = detectedRepo ? `${detectedRepo.repo} token` : "GitHub PAT";
+
+      const inputName = prompt(`Token name:`, defaultName);
+
+      if (!inputName || inputName.trim() === "") {
+        console.error("Error: Token name is required.");
+        Deno.exit(1);
+      }
+
+      config.name = inputName.trim();
+    }
+
+    // Optionally prompt for description if not provided
+    if (!config.description && !options.config) {
+      const defaultDescription = detectedRepo
+        ? `Personal access token for ${detectedRepo.repo}`
+        : "Personal access token";
+
+      const inputDescription = prompt(`Token description (optional):`, defaultDescription);
+      if (inputDescription && inputDescription.trim() !== "") {
+        config.description = inputDescription.trim();
       }
     }
 
@@ -100,7 +141,7 @@ async function main() {
           stdout: "piped",
           stderr: "piped",
         });
-        
+
         const { success } = await process.output();
         if (success) {
           console.log("✓ URL copied to clipboard");
@@ -121,7 +162,7 @@ async function main() {
           stdout: "piped",
           stderr: "piped",
         });
-        
+
         const { success } = await process.output();
         if (success) {
           console.log("✓ Opening in browser...");
@@ -132,7 +173,6 @@ async function main() {
         console.warn("Warning: Browser open command not available");
       }
     }
-
   } catch (error) {
     console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
     Deno.exit(1);

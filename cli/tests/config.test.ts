@@ -1,5 +1,5 @@
 import { assertEquals, assertRejects } from "@std/assert";
-import { parseConfigFile, mergeConfigs } from "../src/config.ts";
+import { mergeConfigs, parseConfigFile } from "../src/config.ts";
 import type { PatConfig } from "../src/types.ts";
 
 // Test YAML parsing
@@ -24,7 +24,7 @@ permissions:
   await Deno.writeTextFile(tempFile, yamlContent);
 
   const config = await parseConfigFile(tempFile);
-  
+
   assertEquals(config, {
     name: "CI Token",
     description: "Token for CI/CD",
@@ -60,7 +60,7 @@ Deno.test("parseConfigFile - valid JSON config", async () => {
   await Deno.writeTextFile(tempFile, jsonContent);
 
   const config = await parseConfigFile(tempFile);
-  
+
   assertEquals(config, {
     name: "API Token",
     description: "Token for API access",
@@ -87,7 +87,7 @@ expirationDate: "2025-12-31"
   await Deno.writeTextFile(tempFile, yamlContent);
 
   const config = await parseConfigFile(tempFile);
-  
+
   assertEquals(config, {
     name: "Custom Token",
     expiration: "custom",

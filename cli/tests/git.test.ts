@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from "@std/assert";
-import { parseGitRemote, getCurrentGitRemote } from "../src/git.ts";
+import { getCurrentGitRemote, parseGitRemote } from "../src/git.ts";
 
 Deno.test("parseGitRemote - SSH format", () => {
   const result = parseGitRemote("git@github.com:haya14busa/github-prefill-fine-grained-pat.git");

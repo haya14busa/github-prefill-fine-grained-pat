@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
-import { parseCliArgs, buildConfigFromCliOptions } from "../src/cli.ts";
-import type { CliOptions, PatConfig } from "../src/types.ts";
+import { buildConfigFromCliOptions, parseCliArgs } from "../src/cli.ts";
+import type { CliOptions } from "../src/types.ts";
 
 // Test parseCliArgs
 Deno.test("parseCliArgs - no arguments returns empty options", () => {
@@ -10,11 +10,14 @@ Deno.test("parseCliArgs - no arguments returns empty options", () => {
 
 Deno.test("parseCliArgs - basic flags", () => {
   const args = [
-    "--name", "Test Token",
-    "--description", "My token",
-    "--owner", "myorg",
+    "--name",
+    "Test Token",
+    "--description",
+    "My token",
+    "--owner",
+    "myorg",
   ];
-  
+
   const options = parseCliArgs(args);
   assertEquals(options, {
     name: "Test Token",
@@ -25,19 +28,28 @@ Deno.test("parseCliArgs - basic flags", () => {
 
 Deno.test("parseCliArgs - all flags", () => {
   const args = [
-    "--config", "config.yaml",
-    "--name", "Test Token",
-    "--description", "My token",
-    "--owner", "myorg",
-    "--expiration", "30",
-    "--expiration-date", "2025-12-31",
-    "--repo-access", "selected",
-    "--repos", "repo1,repo2,repo3",
-    "--permissions", "contents:write,issues:read",
+    "--config",
+    "config.yaml",
+    "--name",
+    "Test Token",
+    "--description",
+    "My token",
+    "--owner",
+    "myorg",
+    "--expiration",
+    "30",
+    "--expiration-date",
+    "2025-12-31",
+    "--repo-access",
+    "selected",
+    "--repos",
+    "repo1,repo2,repo3",
+    "--permissions",
+    "contents:write,issues:read",
     "--copy",
     "--open",
   ];
-  
+
   const options = parseCliArgs(args);
   assertEquals(options, {
     config: "config.yaml",
@@ -80,7 +92,7 @@ Deno.test("buildConfigFromCliOptions - basic conversion", () => {
     description: "My token",
     owner: "myorg",
   };
-  
+
   const config = buildConfigFromCliOptions(options);
   assertEquals(config, {
     name: "Test Token",
@@ -93,7 +105,7 @@ Deno.test("buildConfigFromCliOptions - numeric expiration", () => {
   const options: CliOptions = {
     expiration: "30",
   };
-  
+
   const config = buildConfigFromCliOptions(options);
   assertEquals(config, {
     expiration: 30,
@@ -104,7 +116,7 @@ Deno.test("buildConfigFromCliOptions - string expiration", () => {
   const options: CliOptions = {
     expiration: "none",
   };
-  
+
   const config = buildConfigFromCliOptions(options);
   assertEquals(config, {
     expiration: "none",
@@ -116,7 +128,7 @@ Deno.test("buildConfigFromCliOptions - custom expiration", () => {
     expiration: "custom",
     expirationDate: "2025-12-31",
   };
-  
+
   const config = buildConfigFromCliOptions(options);
   assertEquals(config, {
     expiration: "custom",
@@ -129,7 +141,7 @@ Deno.test("buildConfigFromCliOptions - repos parsing", () => {
     repos: "repo1,repo2,repo3",
     repoAccess: "selected",
   };
-  
+
   const config = buildConfigFromCliOptions(options);
   assertEquals(config, {
     repos: ["repo1", "repo2", "repo3"],
@@ -141,7 +153,7 @@ Deno.test("buildConfigFromCliOptions - permissions parsing", () => {
   const options: CliOptions = {
     permissions: "contents:write,issues:read,metadata:read",
   };
-  
+
   const config = buildConfigFromCliOptions(options);
   assertEquals(config, {
     permissions: {
@@ -156,7 +168,7 @@ Deno.test("buildConfigFromCliOptions - invalid permissions format", () => {
   const options: CliOptions = {
     permissions: "invalid-format",
   };
-  
+
   const config = buildConfigFromCliOptions(options);
   assertEquals(config, {});
 });
@@ -171,7 +183,7 @@ Deno.test("buildConfigFromCliOptions - complete config", () => {
     repos: "api,frontend",
     permissions: "contents:write,issues:read",
   };
-  
+
   const config = buildConfigFromCliOptions(options);
   assertEquals(config, {
     name: "CI Token",

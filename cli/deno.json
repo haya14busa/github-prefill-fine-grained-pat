@@ -1,8 +1,24 @@
 {
   "tasks": {
     "test": "deno test --allow-read --allow-write --allow-run",
+    "test:watch": "deno test --allow-read --allow-write --allow-run --watch",
+    "test:coverage": "deno test --allow-read --allow-write --allow-run --coverage=coverage",
+    "coverage:html": "deno coverage coverage --html",
     "dev": "deno run --allow-read --allow-run src/main.ts",
-    "compile": "deno compile --allow-read --allow-run --allow-net --output github-pat-cli src/main.ts"
+    "run": "deno run --allow-read --allow-run src/main.ts",
+    "run:help": "deno run --allow-read --allow-run src/main.ts --help",
+    "run:example": "deno run --allow-read --allow-run src/main.ts --name 'Example Token' --permissions 'contents:read,metadata:read'",
+    "compile": "deno compile --allow-read --allow-run --allow-net --output github-pat-cli src/main.ts",
+    "compile:all": "deno task compile:linux && deno task compile:macos && deno task compile:windows",
+    "compile:linux": "deno compile --allow-read --allow-run --allow-net --target x86_64-unknown-linux-gnu --output dist/github-pat-cli-linux src/main.ts",
+    "compile:macos": "deno compile --allow-read --allow-run --allow-net --target x86_64-apple-darwin --output dist/github-pat-cli-macos src/main.ts",
+    "compile:windows": "deno compile --allow-read --allow-run --allow-net --target x86_64-pc-windows-msvc --output dist/github-pat-cli-windows.exe src/main.ts",
+    "fmt": "deno fmt",
+    "fmt:check": "deno fmt --check",
+    "lint": "deno lint",
+    "type-check": "deno check src/**/*.ts",
+    "check": "deno task fmt:check && deno task lint && deno task type-check && deno task test",
+    "clean": "rm -rf coverage dist github-pat-cli*"
   },
   "imports": {
     "@std/testing": "jsr:@std/testing@^1.0.0",

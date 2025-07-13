@@ -29,7 +29,9 @@ export async function parseConfigFile(filePath: string): Promise<PatConfig> {
     try {
       return JSON.parse(content) as PatConfig;
     } catch (error) {
-      throw new Error(`Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   } else {
     // YAML
@@ -37,7 +39,9 @@ export async function parseConfigFile(filePath: string): Promise<PatConfig> {
       const parsed = parseYaml(content) as PatConfig;
       return parsed || {};
     } catch (error) {
-      throw new Error(`Failed to parse YAML: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Failed to parse YAML: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 }

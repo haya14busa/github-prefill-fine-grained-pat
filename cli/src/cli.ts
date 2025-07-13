@@ -5,7 +5,7 @@ export function parseCliArgs(args: string[]): CliOptions {
   const parsed = parse(args, {
     string: [
       "config",
-      "name", 
+      "name",
       "description",
       "owner",
       "expiration",
@@ -67,21 +67,21 @@ export function buildConfigFromCliOptions(options: CliOptions): PatConfig {
 
   // Parse repos
   if (options.repos) {
-    config.repos = options.repos.split(",").map(r => r.trim()).filter(r => r);
+    config.repos = options.repos.split(",").map((r) => r.trim()).filter((r) => r);
   }
 
   // Parse permissions
   if (options.permissions) {
     const permissions: Record<string, "none" | "read" | "write"> = {};
     const pairs = options.permissions.split(",");
-    
+
     for (const pair of pairs) {
       const [resource, level] = pair.split(":");
       if (resource && level && ["none", "read", "write"].includes(level)) {
         permissions[resource] = level as "none" | "read" | "write";
       }
     }
-    
+
     if (Object.keys(permissions).length > 0) {
       config.permissions = permissions;
     }
