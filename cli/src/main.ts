@@ -103,7 +103,13 @@ async function main() {
 
     // Prompt for name if not provided
     if (!config.name) {
-      const defaultName = detectedRepo ? `${detectedRepo.repo} token` : "GitHub PAT";
+      // Create a timestamp in YYYY-MM-DD format
+      const now = new Date();
+      const dateStr = now.toISOString().split("T")[0];
+
+      const defaultName = detectedRepo
+        ? `${detectedRepo.repo} ${dateStr}`
+        : `GitHub PAT ${dateStr}`;
 
       const inputName = prompt(`Token name:`, defaultName);
 
@@ -117,9 +123,8 @@ async function main() {
 
     // Optionally prompt for description if not provided
     if (!config.description && !options.config) {
-      const defaultDescription = detectedRepo
-        ? `Personal access token for ${detectedRepo.repo}`
-        : "Personal access token";
+      const defaultDescription =
+        "Created by https://haya14busa.github.io/github-prefill-fine-grained-pat/";
 
       const inputDescription = prompt(`Token description (optional):`, defaultDescription);
       if (inputDescription && inputDescription.trim() !== "") {

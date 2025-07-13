@@ -63,8 +63,8 @@ Interactive mode (prompts for name and description):
 
 ```bash
 github-pat-cli
-# Token name: [github-prefill-fine-grained-pat token] _
-# Token description (optional): [Personal access token for github-prefill-fine-grained-pat] _
+# Token name: [github-prefill-fine-grained-pat 2025-01-13] _
+# Token description (optional): [Created by https://haya14busa.github.io/github-prefill-fine-grained-pat/] _
 ```
 
 Generate URL with auto-detected git repository:
