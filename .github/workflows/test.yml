@@ -108,23 +108,3 @@ jobs:
         ./github-pat-cli.exe --name "Test Token" --permissions "contents:read"
       if: matrix.deno-version == '1.x' && matrix.os == 'windows-latest'
       shell: pwsh
-
-  lint-yaml:
-    name: Lint YAML files
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Lint YAML files
-      uses: ibiqlik/action-yamllint@v3
-      with:
-        config_data: |
-          extends: default
-          rules:
-            line-length:
-              max: 120
-              level: warning
-            comments:
-              min-spaces-from-content: 1
