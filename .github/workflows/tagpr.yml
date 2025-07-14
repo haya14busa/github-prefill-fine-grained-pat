@@ -1,0 +1,136 @@
+name: tagpr and release
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+  attestations: write
+
+jobs:
+  tagpr:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tagpr.outputs.tag }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: true
+        
+    - id: tagpr
+      uses: Songmu/tagpr@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Build and release job only runs when tagpr creates a new tag
+  build-and-release:
+    needs: tagpr
+    if: needs.tagpr.outputs.tag != ''
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.tagpr.outputs.tag }}
+    
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: '1.x'
+    
+    - name: Build for all platforms
+      working-directory: ./cli
+      run: |
+        mkdir -p dist
+        deno task compile:all
+    
+    - name: Create checksums
+      working-directory: ./cli/dist
+      run: |
+        sha256sum github-pat-cli-* > checksums.txt
+        cat checksums.txt
+    
+    - name: Generate build provenance attestations
+      uses: actions/attest-build-provenance@v2
+      with:
+        subject-path: 'cli/dist/github-pat-cli-*'
+    
+    - name: Generate checksums attestation
+      uses: actions/attest-build-provenance@v2
+      with:
+        subject-path: 'cli/dist/checksums.txt'
+    
+    - name: Upload release assets and publish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_REPO: ${{ github.repository }}
+        TAG: ${{ needs.tagpr.outputs.tag }}
+      run: |
+        # Upload all CLI binaries and checksums to the draft release
+        gh release upload "${TAG}" cli/dist/github-pat-cli-* cli/dist/checksums.txt
+        
+        # Get current release body
+        current_body=$(gh release view "${TAG}" --json body -q .body)
+        
+        # Create complete release notes with installation instructions and attestation info
+        cat << 'EOF' > complete_release_notes.md
+        ${current_body}
+        
+        ## CLI Installation
+        
+        ### Using Deno
+        ```bash
+        deno install --allow-read --allow-run -n github-pat-cli \
+          https://raw.githubusercontent.com/${{ github.repository }}/${TAG}/cli/src/main.ts
+        ```
+        
+        ### Using precompiled binaries
+        
+        Download the appropriate binary for your platform and architecture:
+        
+        **Windows:**
+        - x64: `github-pat-cli-x86_64-pc-windows-msvc.exe`
+        
+        **macOS:**
+        - Intel (x64): `github-pat-cli-x86_64-apple-darwin`
+        - Apple Silicon (ARM64): `github-pat-cli-aarch64-apple-darwin`
+        
+        **Linux:**
+        - x64: `github-pat-cli-x86_64-unknown-linux-gnu`
+        - ARM64: `github-pat-cli-aarch64-unknown-linux-gnu`
+        
+        Make it executable (Linux/macOS):
+        ```bash
+        chmod +x github-pat-cli-*
+        ```
+        
+        ## Checksums
+        
+        See `checksums.txt` for SHA256 checksums of all binaries.
+        
+        ## Verify Build Provenance
+        
+        All release artifacts include build provenance attestations. You can verify them using the GitHub CLI:
+        
+        ```bash
+        # Verify a specific binary
+        gh attestation verify github-pat-cli-x86_64-pc-windows-msvc.exe \
+          --repo ${{ github.repository }}
+        
+        # Verify checksums file
+        gh attestation verify checksums.txt \
+          --repo ${{ github.repository }}
+        ```
+        
+        Learn more about [artifact attestations](https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds).
+        EOF
+        
+        # Update and publish the release
+        gh release edit "${TAG}" \
+          --draft=false \
+          --notes-file complete_release_notes.md
