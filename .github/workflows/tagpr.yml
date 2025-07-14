@@ -39,7 +39,7 @@ jobs:
         ref: ${{ needs.tagpr.outputs.tag }}
     
     - name: Setup Deno
-      uses: denoland/setup-deno@v1
+      uses: denoland/setup-deno@v2
       with:
         deno-version: '1.x'
     
