@@ -64,14 +64,50 @@ jobs:
       with:
         subject-path: 'cli/dist/checksums.txt'
     
+    - name: Check for binstaller config
+      id: check-config
+      run: |
+        if [ -f ".config/binstaller.yml" ]; then
+          echo "config_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "config_exists=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - uses: actionutils/trusted-tag-verifier@v0
+      if: steps.check-config.outputs.config_exists == 'true'
+      with:
+        verify: 'binary-install/setup-x@v1'
+    
+    - name: Install binstaller
+      if: steps.check-config.outputs.config_exists == 'true'
+      uses: binary-install/setup-x@v1
+      with:
+        script_url: https://raw.githubusercontent.com/binary-install/binstaller/main/install.sh
+        gh_attestations_verify_flags: --repo binary-install/binstaller --cert-identity-regex=.github/workflows/generate-installer.yml@refs/heads/main
+    
+    - name: Embed checksums
+      if: steps.check-config.outputs.config_exists == 'true'
+      working-directory: ./
+      run: binst embed-checksums --mode=checksum-file --file=./cli/dist/checksums.txt --version='${{ needs.tagpr.outputs.tag }}'
+    
+    - name: Generate installer
+      if: steps.check-config.outputs.config_exists == 'true'
+      run: binst gen --target-version='${{ needs.tagpr.outputs.tag }}' --output=./cli/dist/install.sh
+    
+    - name: Attest installer
+      if: steps.check-config.outputs.config_exists == 'true'
+      uses: actions/attest-build-provenance@v2
+      with:
+        subject-path: ./cli/dist/install.sh
+    
     - name: Upload release assets and publish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_REPO: ${{ github.repository }}
         TAG: ${{ needs.tagpr.outputs.tag }}
       run: |
-        # Upload all CLI binaries and checksums to the draft release
-        gh release upload "${TAG}" cli/dist/github-pat-cli-* cli/dist/checksums.txt
+        # Upload all CLI binaries, checksums, and installer script to the draft release
+        gh release upload "${TAG}" cli/dist/github-pat-cli-* cli/dist/checksums.txt cli/dist/install.sh || true
         
         # Get current release body
         current_body=$(gh release view "${TAG}" --json body -q .body)
@@ -81,6 +117,20 @@ jobs:
         ${current_body}
         
         ## CLI Installation
+        
+        ### Quick install (recommended)
+        
+        Using the installer script:
+        ```bash
+        curl -fsSL https://github.com/${{ github.repository }}/releases/download/${TAG}/install.sh | sh
+        ```
+        
+        Or download and run:
+        ```bash
+        curl -fsSL -o install.sh https://github.com/${{ github.repository }}/releases/download/${TAG}/install.sh
+        chmod +x install.sh
+        ./install.sh
+        ```
         
         ### Using Deno
         ```bash
@@ -123,6 +173,10 @@ jobs:
         
         # Verify checksums file
         gh attestation verify checksums.txt \
+          --repo ${{ github.repository }}
+        
+        # Verify installer script
+        gh attestation verify install.sh \
           --repo ${{ github.repository }}
         ```
         

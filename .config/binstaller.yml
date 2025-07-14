@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/binary-install/binstaller/main/schema/output/@typespec/json-schema/InstallSpec.json
+schema: v1
+name: github-pat-cli
+repo: haya14busa/github-prefill-fine-grained-pat
+asset:
+  template: github-pat-cli-${ARCH}-${OS}${EXT}
+  rules:
+  - when:
+      arch: amd64
+    arch: x86_64
+  - when:
+      arch: arm64
+    arch: aarch64
+  - when:
+      os: darwin
+    os: apple-darwin
+  - when:
+      os: linux
+    os: unknown-linux-gnu
+  - when:
+      os: windows
+    os: pc-windows-msvc
+    ext: .exe
+checksums:
+  algorithm: sha256
+  template: checksums.txt
+  embedded_checksums:
+    v0.1.0:
+    - filename: github-pat-cli-aarch64-apple-darwin
+      hash: 26809f0a3e7d6f1b72f8e8944820fa4d7bdcce9d822cd4734d33940fb910919b
+    - filename: github-pat-cli-aarch64-unknown-linux-gnu
+      hash: fd778ae077d2b81295594a3e3969f72dac2dac3879c359d11e1e3a033a565541
+    - filename: github-pat-cli-x86_64-apple-darwin
+      hash: 5281c8263948e0e744e7f5e4f61ceeb082f830a1c76ffb9a58bda710b90d5af3
+    - filename: github-pat-cli-x86_64-pc-windows-msvc.exe
+      hash: 4809925ce9e62d4ff84c24f87f0f41111085c42c7e2f26b5ce2a66b5ebe27372
+    - filename: github-pat-cli-x86_64-unknown-linux-gnu
+      hash: 666eb7d126d955765b7293ca1f4bdab2707f2024350ff80efbcc9bc9edfc9b0c
