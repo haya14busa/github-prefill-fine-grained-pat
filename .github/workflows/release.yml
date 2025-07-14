@@ -26,9 +26,7 @@ jobs:
       working-directory: ./cli
       run: |
         mkdir -p dist
-        deno task compile:linux
-        deno task compile:macos
-        deno task compile:windows
+        deno task compile:all
     
     - name: Create checksums
       working-directory: ./cli/dist
@@ -64,9 +62,11 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          cli/dist/github-pat-cli-linux
-          cli/dist/github-pat-cli-macos
-          cli/dist/github-pat-cli-windows.exe
+          cli/dist/github-pat-cli-x86_64-pc-windows-msvc.exe
+          cli/dist/github-pat-cli-x86_64-apple-darwin
+          cli/dist/github-pat-cli-aarch64-apple-darwin
+          cli/dist/github-pat-cli-x86_64-unknown-linux-gnu
+          cli/dist/github-pat-cli-aarch64-unknown-linux-gnu
           cli/dist/checksums.txt
         body: |
           ## What's Changed
@@ -83,10 +83,18 @@ jobs:
           
           ### Using precompiled binaries
           
-          Download the appropriate binary for your platform:
-          - Linux: `github-pat-cli-linux`
-          - macOS: `github-pat-cli-macos`
-          - Windows: `github-pat-cli-windows.exe`
+          Download the appropriate binary for your platform and architecture:
+          
+          **Windows:**
+          - x64: `github-pat-cli-x86_64-pc-windows-msvc.exe`
+          
+          **macOS:**
+          - Intel (x64): `github-pat-cli-x86_64-apple-darwin`
+          - Apple Silicon (ARM64): `github-pat-cli-aarch64-apple-darwin`
+          
+          **Linux:**
+          - x64: `github-pat-cli-x86_64-unknown-linux-gnu`
+          - ARM64: `github-pat-cli-aarch64-unknown-linux-gnu`
           
           Make it executable (Linux/macOS):
           ```bash

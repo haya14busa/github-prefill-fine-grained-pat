@@ -28,13 +28,25 @@ deno run --allow-read --allow-run https://raw.githubusercontent.com/haya14busa/g
 
 ### Using compiled binary
 
+Download pre-compiled binaries from the [releases page](https://github.com/haya14busa/github-prefill-fine-grained-pat/releases) or compile from source:
+
 ```bash
-# Compile
-deno compile --allow-read --allow-run --allow-net --output github-pat-cli src/main.ts
+# Compile for current platform
+deno task compile
 
 # Run
 ./github-pat-cli [OPTIONS]
 ```
+
+#### Supported Platforms
+
+| Platform | Architecture | Target | Binary Name |
+|----------|-------------|--------|-------------|
+| Windows | x64 | `x86_64-pc-windows-msvc` | `github-pat-cli-x86_64-pc-windows-msvc.exe` |
+| macOS | x64 (Intel) | `x86_64-apple-darwin` | `github-pat-cli-x86_64-apple-darwin` |
+| macOS | ARM64 (Apple Silicon) | `aarch64-apple-darwin` | `github-pat-cli-aarch64-apple-darwin` |
+| Linux | x64 | `x86_64-unknown-linux-gnu` | `github-pat-cli-x86_64-unknown-linux-gnu` |
+| Linux | ARM64 | `aarch64-unknown-linux-gnu` | `github-pat-cli-aarch64-unknown-linux-gnu` |
 
 ## Usage
 
@@ -179,11 +191,13 @@ deno task type-check       # Type check all TypeScript files
 deno task check            # Run all checks (format, lint, type-check, test)
 
 # Building
-deno task compile          # Compile for current platform
-deno task compile:all      # Compile for all platforms
-deno task compile:linux    # Compile for Linux
-deno task compile:macos    # Compile for macOS
-deno task compile:windows  # Compile for Windows
+deno task compile                            # Compile for current platform
+deno task compile:all                        # Compile for all platforms
+deno task compile:x86_64-pc-windows-msvc     # Compile for Windows x64
+deno task compile:x86_64-apple-darwin        # Compile for macOS Intel
+deno task compile:aarch64-apple-darwin       # Compile for macOS Apple Silicon
+deno task compile:x86_64-unknown-linux-gnu   # Compile for Linux x64
+deno task compile:aarch64-unknown-linux-gnu  # Compile for Linux ARM64
 
 # Maintenance
 deno task clean            # Clean build artifacts and coverage data
