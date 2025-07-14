@@ -113,75 +113,76 @@ jobs:
         current_body=$(gh release view "${TAG}" --json body -q .body)
         
         # Create complete release notes with installation instructions and attestation info
-        cat << 'EOF' > complete_release_notes.md
-        ${current_body}
+        cat << EOF > complete_release_notes.md
+${current_body}
         
-        ## CLI Installation
+## CLI Installation
         
-        ### Quick install (recommended)
+### Quick install (recommended)
         
-        Using the installer script:
-        ```bash
-        curl -fsSL https://github.com/${{ github.repository }}/releases/download/${TAG}/install.sh | sh
-        ```
+Using the installer script:
+\`\`\`bash
+curl -fsSL https://github.com/${GH_REPO}/releases/download/${TAG}/install.sh | sh
+\`\`\`
         
-        Or download and run:
-        ```bash
-        curl -fsSL -o install.sh https://github.com/${{ github.repository }}/releases/download/${TAG}/install.sh
-        chmod +x install.sh
-        ./install.sh
-        ```
+Or download and run:
+\`\`\`bash
+curl -fsSL -o install.sh https://github.com/${GH_REPO}/releases/download/${TAG}/install.sh
+chmod +x install.sh
+./install.sh
+\`\`\`
         
-        ### Using Deno
-        ```bash
-        deno install --allow-read --allow-run -n github-pat-cli \
-          https://raw.githubusercontent.com/${{ github.repository }}/${TAG}/cli/src/main.ts
-        ```
+### Using Deno
+\`\`\`bash
+deno install --allow-read --allow-run -n github-pat-cli \\
+  https://raw.githubusercontent.com/${GH_REPO}/${TAG}/cli/src/main.ts
+\`\`\`
         
-        ### Using precompiled binaries
         
-        Download the appropriate binary for your platform and architecture:
+### Using precompiled binaries
         
-        **Windows:**
-        - x64: `github-pat-cli-x86_64-pc-windows-msvc.exe`
+Download the appropriate binary for your platform and architecture:
         
-        **macOS:**
-        - Intel (x64): `github-pat-cli-x86_64-apple-darwin`
-        - Apple Silicon (ARM64): `github-pat-cli-aarch64-apple-darwin`
+**Windows:**
+- x64: \`github-pat-cli-x86_64-pc-windows-msvc.exe\`
         
-        **Linux:**
-        - x64: `github-pat-cli-x86_64-unknown-linux-gnu`
-        - ARM64: `github-pat-cli-aarch64-unknown-linux-gnu`
+**macOS:**
+- Intel (x64): \`github-pat-cli-x86_64-apple-darwin\`
+- Apple Silicon (ARM64): \`github-pat-cli-aarch64-apple-darwin\`
         
-        Make it executable (Linux/macOS):
-        ```bash
-        chmod +x github-pat-cli-*
-        ```
+**Linux:**
+- x64: \`github-pat-cli-x86_64-unknown-linux-gnu\`
+- ARM64: \`github-pat-cli-aarch64-unknown-linux-gnu\`
         
-        ## Checksums
+Make it executable (Linux/macOS):
+\`\`\`bash
+chmod +x github-pat-cli-*
+\`\`\`
         
-        See `checksums.txt` for SHA256 checksums of all binaries.
+## Checksums
         
-        ## Verify Build Provenance
+See \`checksums.txt\` for SHA256 checksums of all binaries.
         
-        All release artifacts include build provenance attestations. You can verify them using the GitHub CLI:
+## Verify Build Provenance
         
-        ```bash
-        # Verify a specific binary
-        gh attestation verify github-pat-cli-x86_64-pc-windows-msvc.exe \
-          --repo ${{ github.repository }}
+All release artifacts include build provenance attestations. You can verify them using the GitHub CLI:
         
-        # Verify checksums file
-        gh attestation verify checksums.txt \
-          --repo ${{ github.repository }}
+\`\`\`bash
+# Verify a specific binary
+gh attestation verify github-pat-cli-x86_64-pc-windows-msvc.exe \\
+  --repo ${GH_REPO}
         
-        # Verify installer script
-        gh attestation verify install.sh \
-          --repo ${{ github.repository }}
-        ```
+# Verify checksums file
+gh attestation verify checksums.txt \\
+  --repo ${GH_REPO}
         
-        Learn more about [artifact attestations](https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds).
-        EOF
+# Verify installer script
+gh attestation verify install.sh \\
+  --repo ${GH_REPO}
+\`\`\`
+        
+Learn more about [artifact attestations](https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds).
+EOF
         
         # Update and publish the release
         gh release edit "${TAG}" \
