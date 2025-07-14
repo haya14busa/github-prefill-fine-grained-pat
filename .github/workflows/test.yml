@@ -15,11 +15,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - uses: aquaproj/aqua-installer@v3.1.0
       with:
-        node-version: '20'
-        cache: 'npm'
+        aqua_version: v2.53.3
     
     - name: Install dependencies
       run: npm ci
@@ -42,26 +40,24 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        deno-version: ['1.x', 'canary']
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Setup Deno
-      uses: denoland/setup-deno@v2
+    - uses: aquaproj/aqua-installer@v3.1.0
       with:
-        deno-version: ${{ matrix.deno-version }}
+        aqua_version: v2.53.3
     
     - name: Check formatting
       working-directory: ./cli
       run: deno task fmt:check
-      if: matrix.os == 'ubuntu-latest' && matrix.deno-version == '1.x'
+      if: matrix.os == 'ubuntu-latest'
     
     - name: Run linter
       working-directory: ./cli
       run: deno task lint
-      if: matrix.os == 'ubuntu-latest' && matrix.deno-version == '1.x'
+      if: matrix.os == 'ubuntu-latest'
     
     - name: Type check
       working-directory: ./cli
@@ -74,14 +70,14 @@ jobs:
     - name: Generate test coverage
       working-directory: ./cli
       run: deno task test:coverage
-      if: matrix.os == 'ubuntu-latest' && matrix.deno-version == '1.x'
+      if: matrix.os == 'ubuntu-latest'
     
     - name: Upload coverage reports
       uses: codecov/codecov-action@v5
       with:
         directory: ./cli/coverage
         flags: cli
-      if: matrix.os == 'ubuntu-latest' && matrix.deno-version == '1.x'
+      if: matrix.os == 'ubuntu-latest'
     
     - name: Test CLI execution
       working-directory: ./cli
@@ -92,19 +88,18 @@ jobs:
     - name: Test compilation
       working-directory: ./cli
       run: deno task compile
-      if: matrix.deno-version == '1.x'
     
     - name: Test compiled binary
       working-directory: ./cli
       run: |
         ./github-pat-cli --help
         ./github-pat-cli --name "Test Token" --permissions "contents:read"
-      if: matrix.deno-version == '1.x' && matrix.os != 'windows-latest'
+      if: matrix.os != 'windows-latest'
     
     - name: Test compiled binary (Windows)
       working-directory: ./cli
       run: |
         ./github-pat-cli.exe --help
         ./github-pat-cli.exe --name "Test Token" --permissions "contents:read"
-      if: matrix.deno-version == '1.x' && matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-latest'
       shell: pwsh

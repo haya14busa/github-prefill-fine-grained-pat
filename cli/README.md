@@ -16,7 +16,22 @@ parameters.
 
 ## Installation
 
-### Using Deno
+### Using aqua
+
+If you use [aqua](https://aquaproj.github.io/), you can manage Deno version declaratively:
+
+```bash
+# Install aqua if you haven't already
+# https://aquaproj.github.io/docs/install
+
+# Install tools defined in aqua.yaml (including Deno)
+aqua i
+
+# Then install the CLI globally
+deno install --allow-read --allow-run -n github-pat-cli https://raw.githubusercontent.com/haya14busa/github-prefill-fine-grained-pat/main/cli/src/main.ts
+```
+
+### Using Deno directly
 
 ```bash
 # Install globally
@@ -167,6 +182,10 @@ Permission levels: `none`, `read`, `write`
 ### Prerequisites
 
 - [Deno](https://deno.land/) runtime
+- Or use [aqua](https://aquaproj.github.io/) for version management:
+  ```bash
+  aqua i  # Installs Deno version specified in aqua.yaml
+  ```
 
 ### Available Tasks
 
