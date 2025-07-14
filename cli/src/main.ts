@@ -109,7 +109,7 @@ async function main() {
 
       const trimmedName = inputName?.trim() || "";
       const validationError = validateTokenName(trimmedName);
-      
+
       if (validationError) {
         console.error(`Error: ${validationError}`);
         Deno.exit(1);

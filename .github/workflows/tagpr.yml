@@ -38,10 +38,9 @@ jobs:
       with:
         ref: ${{ needs.tagpr.outputs.tag }}
     
-    - name: Setup Deno
-      uses: denoland/setup-deno@v2
+    - uses: aquaproj/aqua-installer@v4.0.2
       with:
-        deno-version: '1.x'
+        aqua_version: v2.53.3
     
     - name: Build for all platforms
       working-directory: ./cli
