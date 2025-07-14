@@ -38,7 +38,7 @@ jobs:
       with:
         ref: ${{ needs.tagpr.outputs.tag }}
     
-    - uses: aquaproj/aqua-installer@v3.1.0
+    - uses: aquaproj/aqua-installer@v4.0.2
       with:
         aqua_version: v2.53.3
     
