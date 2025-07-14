@@ -20,14 +20,14 @@ export function generateDefaultTokenName(repoName?: string): string {
   const dateStr = new Date().toISOString().split("T")[0];
   const baseName = repoName || "GitHub PAT";
   const fullName = `${baseName} ${dateStr}`;
-  
+
   // If the full name is too long, truncate the base name
   if (fullName.length > 40) {
     const maxBaseLength = 40 - dateStr.length - 1; // -1 for space
     const truncatedBase = baseName.substring(0, maxBaseLength);
     return `${truncatedBase} ${dateStr}`;
   }
-  
+
   return fullName;
 }
 

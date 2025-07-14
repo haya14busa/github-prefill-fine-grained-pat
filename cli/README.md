@@ -43,7 +43,9 @@ deno run --allow-read --allow-run https://raw.githubusercontent.com/haya14busa/g
 
 ### Using compiled binary
 
-Download pre-compiled binaries from the [releases page](https://github.com/haya14busa/github-prefill-fine-grained-pat/releases) or compile from source:
+Download pre-compiled binaries from the
+[releases page](https://github.com/haya14busa/github-prefill-fine-grained-pat/releases) or compile
+from source:
 
 ```bash
 # Compile for current platform
@@ -55,13 +57,13 @@ deno task compile
 
 #### Supported Platforms
 
-| Platform | Architecture | Target | Binary Name |
-|----------|-------------|--------|-------------|
-| Windows | x64 | `x86_64-pc-windows-msvc` | `github-pat-cli-x86_64-pc-windows-msvc.exe` |
-| macOS | x64 (Intel) | `x86_64-apple-darwin` | `github-pat-cli-x86_64-apple-darwin` |
-| macOS | ARM64 (Apple Silicon) | `aarch64-apple-darwin` | `github-pat-cli-aarch64-apple-darwin` |
-| Linux | x64 | `x86_64-unknown-linux-gnu` | `github-pat-cli-x86_64-unknown-linux-gnu` |
-| Linux | ARM64 | `aarch64-unknown-linux-gnu` | `github-pat-cli-aarch64-unknown-linux-gnu` |
+| Platform | Architecture          | Target                      | Binary Name                                 |
+| -------- | --------------------- | --------------------------- | ------------------------------------------- |
+| Windows  | x64                   | `x86_64-pc-windows-msvc`    | `github-pat-cli-x86_64-pc-windows-msvc.exe` |
+| macOS    | x64 (Intel)           | `x86_64-apple-darwin`       | `github-pat-cli-x86_64-apple-darwin`        |
+| macOS    | ARM64 (Apple Silicon) | `aarch64-apple-darwin`      | `github-pat-cli-aarch64-apple-darwin`       |
+| Linux    | x64                   | `x86_64-unknown-linux-gnu`  | `github-pat-cli-x86_64-unknown-linux-gnu`   |
+| Linux    | ARM64                 | `aarch64-unknown-linux-gnu` | `github-pat-cli-aarch64-unknown-linux-gnu`  |
 
 ## Usage
 

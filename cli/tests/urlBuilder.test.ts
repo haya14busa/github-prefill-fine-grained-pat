@@ -107,7 +107,8 @@ Deno.test("buildUrl - special characters are encoded", () => {
 });
 
 Deno.test("buildUrl - handles very long token names", () => {
-  const longName = "This is a very long token name that exceeds the 40 character limit imposed by GitHub";
+  const longName =
+    "This is a very long token name that exceeds the 40 character limit imposed by GitHub";
   const url = buildUrl({
     name: longName,
   });

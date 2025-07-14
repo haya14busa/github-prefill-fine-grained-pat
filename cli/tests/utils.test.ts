@@ -1,9 +1,5 @@
 import { assertEquals } from "@std/assert";
-import {
-  generateDefaultTokenName,
-  truncateTokenName,
-  validateTokenName,
-} from "../src/utils.ts";
+import { generateDefaultTokenName, truncateTokenName, validateTokenName } from "../src/utils.ts";
 
 Deno.test("truncateTokenName - returns unchanged name if under limit", () => {
   const name = "Short name";
@@ -25,11 +21,11 @@ Deno.test("truncateTokenName - handles exactly 40 chars", () => {
 
 Deno.test("generateDefaultTokenName - generates name with date", () => {
   const dateStr = new Date().toISOString().split("T")[0];
-  
+
   // Without repo name
   const defaultName = generateDefaultTokenName();
   assertEquals(defaultName, `GitHub PAT ${dateStr}`);
-  
+
   // With short repo name
   const withRepo = generateDefaultTokenName("my-repo");
   assertEquals(withRepo, `my-repo ${dateStr}`);
@@ -38,13 +34,13 @@ Deno.test("generateDefaultTokenName - generates name with date", () => {
 Deno.test("generateDefaultTokenName - truncates long repo names", () => {
   const dateStr = new Date().toISOString().split("T")[0];
   const longRepoName = "this-is-a-very-long-repository-name-that-will-be-truncated";
-  
+
   const result = generateDefaultTokenName(longRepoName);
   assertEquals(result.length, 40);
-  
+
   // Should end with the date
   assertEquals(result.endsWith(dateStr), true);
-  
+
   // Should start with truncated repo name
   const expectedMaxRepoLength = 40 - dateStr.length - 1;
   assertEquals(result.startsWith(longRepoName.substring(0, expectedMaxRepoLength)), true);
