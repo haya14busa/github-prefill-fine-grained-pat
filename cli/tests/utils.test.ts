@@ -70,6 +70,8 @@ Deno.test("validateTokenName - rejects names over 40 chars", () => {
 });
 
 Deno.test("validateTokenName - handles null/undefined gracefully", () => {
-  assertEquals(validateTokenName(null as any), "Token name is required");
-  assertEquals(validateTokenName(undefined as any), "Token name is required");
+  // @ts-expect-error: Testing runtime behavior with invalid input
+  assertEquals(validateTokenName(null), "Token name is required");
+  // @ts-expect-error: Testing runtime behavior with invalid input
+  assertEquals(validateTokenName(undefined), "Token name is required");
 });
