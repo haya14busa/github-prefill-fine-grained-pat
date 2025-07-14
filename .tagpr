@@ -1,0 +1,23 @@
+# tagpr configuration
+# https://github.com/Songmu/tagpr
+
+# The branch for releases
+tagpr.releaseBranch = main
+
+# Add v prefix to git tags (e.g., v1.0.0)
+tagpr.vPrefix = true
+
+# Enable changelog generation
+tagpr.changelog = true
+
+# Commands to run before tagging
+# tagpr.command =
+
+# Whether to create GitHub releases (draft for later publishing)
+tagpr.release = draft
+
+# Template for pull request title
+# tagpr.template =
+
+# Template for release body
+# tagpr.releaseBody =
