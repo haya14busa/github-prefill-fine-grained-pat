@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.1.1](https://github.com/haya14busa/github-prefill-fine-grained-pat/compare/v0.1.0...v0.1.1) - 2025-07-14
+
 ## [v0.1.0](https://github.com/haya14busa/github-prefill-fine-grained-pat/commits/v0.1.0) - 2025-07-14
 - ci(deps): bump codecov/codecov-action from 3 to 5 by @dependabot[bot] in https://github.com/haya14busa/github-prefill-fine-grained-pat/pull/6
 - ci(deps): bump actions/configure-pages from 4 to 5 by @dependabot[bot] in https://github.com/haya14busa/github-prefill-fine-grained-pat/pull/5
