@@ -55,12 +55,12 @@ jobs:
         cat checksums.txt
     
     - name: Generate build provenance attestations
-      uses: actions/attest-build-provenance@v2
+      uses: actions/attest-build-provenance@v3
       with:
         subject-path: 'cli/dist/github-pat-cli-*'
     
     - name: Generate checksums attestation
-      uses: actions/attest-build-provenance@v2
+      uses: actions/attest-build-provenance@v3
       with:
         subject-path: 'cli/dist/checksums.txt'
     
@@ -96,7 +96,7 @@ jobs:
     
     - name: Attest installer
       if: steps.check-config.outputs.config_exists == 'true'
-      uses: actions/attest-build-provenance@v2
+      uses: actions/attest-build-provenance@v3
       with:
         subject-path: ./cli/dist/install.sh
     
